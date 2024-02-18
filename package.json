@@ -1,0 +1,26 @@
+{
+  "type": "module",
+  "name": "@michalporeba/repo-watcher",
+  "version": "0.0.1",
+  "description": "A library for collecting and analysing (GitHub) code repository statistics.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/"
+  },
+  "keywords": [],
+  "author": "michalporeba@gmail.com",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-cli": "^29.7.0"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/src",
+      "<rootDir>/tests"
+    ],
+    "testMatch": [
+      "**/tests/**/*.js"
+    ]
+  }
+}
