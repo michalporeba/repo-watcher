@@ -5,11 +5,16 @@
   "description": "A library for collecting and analysing (GitHub) code repository statistics.",
   "main": "src/index.js",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/"
+    "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/unit/",
+    "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/integration/",
+    "test": "npm run test:unit && npm run test:integration"
   },
   "keywords": [],
   "author": "michalporeba@gmail.com",
   "license": "MIT",
+  "dependencies": {
+    "@octokit/rest": "^20.0.2"
+  },
   "devDependencies": {
     "jest": "^29.7.0",
     "jest-cli": "^29.7.0"
