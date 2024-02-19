@@ -19,3 +19,12 @@ export const createRequestForUserRepos = (username) => {
     headers: GITHUB_HEADERS,
   };
 };
+
+export const createRequestForOrgRepos = (org) => {
+  return {
+    org: org,
+    type: "public",
+    per_page: GITHUB_PAGESIZE,
+    headers: GITHUB_HEADERS,
+  };
+};

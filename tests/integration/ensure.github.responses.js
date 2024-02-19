@@ -3,11 +3,14 @@
 import {
   createOctokit,
   createRequestForUserRepos,
+  createRequestForOrgRepos,
 } from "../../src/octokit-utils.js";
 
 const NON_EMPTY_STRING_REGEX = /.+/;
 const URL_REGEX =
   /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
+const DATETIME_REGEX =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
 
 expect.extend({
   toBeNullOrString(value) {
@@ -18,9 +21,19 @@ expect.extend({
   },
   toBeNullOrMatch(value, pattern) {
     return {
-      message: () => `expected ${value} to be null or match ${pattern}`,
+      message: () => `expected ${value} to be null or to match ${pattern}`,
       pass:
         value === null || (typeof value === "string" && !!value.match(pattern)),
+    };
+  },
+  toBeNullEmptyOrMatch(value, pattern) {
+    return {
+      message: () =>
+        `expected ${value} to be null, an empty string or to match ${pattern}`,
+      pass:
+        value === null ||
+        value === "" ||
+        (typeof value === "string" && !!value.match(pattern)),
     };
   },
 });
@@ -28,6 +41,33 @@ expect.extend({
 const EXPECTED_REPO_RESPONSE_SHAPE = {
   name: expect.stringMatching(NON_EMPTY_STRING_REGEX),
   owner: { login: expect.stringMatching(NON_EMPTY_STRING_REGEX) },
+  created_at: expect.stringMatching(DATETIME_REGEX),
+  updated_at: expect.stringMatching(DATETIME_REGEX),
+  pushed_at: expect.stringMatching(DATETIME_REGEX),
+  archived: expect.any(Boolean),
+  disabled: expect.any(Boolean),
+  fork: expect.any(Boolean),
+  is_template: expect.any(Boolean),
+  has_issues: expect.any(Boolean),
+  has_downloads: expect.any(Boolean),
+  has_projects: expect.any(Boolean),
+  has_wiki: expect.any(Boolean),
+  has_pages: expect.any(Boolean),
+  has_discussions: expect.any(Boolean),
+  size: expect.any(Number),
+  forks: expect.any(Number),
+  open_issues: expect.any(Number),
+  watchers: expect.any(Number),
+};
+
+const validateRepoResponseShape = (data) => {
+  expect(Array.isArray(data)).toBeTruthy();
+  data.forEach((r) => {
+    expect(r).toMatchObject(EXPECTED_REPO_RESPONSE_SHAPE);
+    expect(r.description).toBeNullOrString();
+    expect(r.language).toBeNullOrString();
+    expect(r.homepage).toBeNullEmptyOrMatch(URL_REGEX);
+  });
 };
 
 const octokit = createOctokit();
@@ -38,11 +78,11 @@ describe("GitHub API responses", () => {
       createRequestForUserRepos("michalporeba"),
     );
 
-    expect(Array.isArray(data)).toBeTruthy();
-    data.forEach((r) => {
-      expect(r).toMatchObject(EXPECTED_REPO_RESPONSE_SHAPE);
-      expect(r.description).toBeNullOrString();
-      expect(r.html_url).toBeNullOrMatch(URL_REGEX);
-    });
+    validateRepoResponseShape(data);
+  });
+  test("organisation repos have necessary properties", async () => {
+    const { data } = await octokit.rest.repos.listForOrg(
+      createRequestForOrgRepos("alphagov"),
+    );
   });
 });
