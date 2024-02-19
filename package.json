@@ -29,6 +29,17 @@
     ],
     "testMatch": [
       "**/tests/**/*.js"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "clover"
     ]
   }
 }
