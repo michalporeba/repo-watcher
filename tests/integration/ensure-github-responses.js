@@ -19,6 +19,12 @@ expect.extend({
       pass: value === null || typeof value === "string",
     };
   },
+  toBeUndefinedOrString(value) {
+    return {
+      message: () => `expected ${value} to be null or a string`,
+      pass: value === undefined || typeof value === "string",
+    };
+  },
   toBeNullOrMatch(value, pattern) {
     return {
       message: () => `expected ${value} to be null or to match ${pattern}`,
@@ -44,6 +50,7 @@ const EXPECTED_REPO_RESPONSE_SHAPE = {
   created_at: expect.stringMatching(DATETIME_REGEX),
   updated_at: expect.stringMatching(DATETIME_REGEX),
   pushed_at: expect.stringMatching(DATETIME_REGEX),
+  default_branch: expect.any(String),
   archived: expect.any(Boolean),
   disabled: expect.any(Boolean),
   fork: expect.any(Boolean),
@@ -67,6 +74,8 @@ const validateRepoResponseShape = (data) => {
     expect(r.description).toBeNullOrString();
     expect(r.language).toBeNullOrString();
     expect(r.homepage).toBeNullEmptyOrMatch(URL_REGEX);
+    expect(r.license?.name).toBeUndefinedOrString(String);
+    expect(r.license?.spdx_id).toBeUndefinedOrString(String);
   });
 };
 
@@ -80,6 +89,7 @@ describe("GitHub API responses", () => {
 
     validateRepoResponseShape(data);
   });
+
   test("organisation repos have necessary properties", async () => {
     const { data } = await octokit.rest.repos.listForOrg(
       createRequestForOrgRepos("alphagov"),
