@@ -1,5 +1,11 @@
 "use strict";
 
+/*
+ * The purpose of these integration tests is to catch any changes to API returns
+ * that can case the repo-watcher to stop working in the future.
+ * The checks goes beyond ensuring a property exists.
+ */
+
 import {
   createOctokit,
   createRequestForUserRepos,
@@ -82,7 +88,7 @@ const validateRepoResponseShape = (data) => {
 const octokit = createOctokit();
 
 describe("GitHub API responses", () => {
-  test("user repos have necessary properties", async () => {
+  test("user repos have necessary properties and values", async () => {
     const { data } = await octokit.rest.repos.listForUser(
       createRequestForUserRepos("michalporeba"),
     );
@@ -90,7 +96,7 @@ describe("GitHub API responses", () => {
     validateRepoResponseShape(data);
   });
 
-  test("organisation repos have necessary properties", async () => {
+  test("organisation repos have necessary properties and values", async () => {
     const { data } = await octokit.rest.repos.listForOrg(
       createRequestForOrgRepos("alphagov"),
     );
