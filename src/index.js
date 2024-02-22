@@ -1,10 +1,10 @@
-import { Octokit } from "@octokit/rest";
 import {
   createOctokit,
   createRequestForOrgRepos,
   createRequestForUserRepos,
 } from "./octokit-utils";
 
+// gets a preconfigured instance of octokit
 const octokit = createOctokit();
 
 const getOrgRepositories = async (org) =>
@@ -14,9 +14,12 @@ const getOrgRepositories = async (org) =>
   );
 
 const getUserRepositories = async (user) => {
-  console.log("GETTING USER REPOS");
-  //console.log(Octokit);
-  //console.log(octokit);
+  console.log("From getUserRepositories");
+  console.log(octokit);
+
+  // is jest module mocking enough to swap the implementation of the octokit?
+  // or should it pass the octokit mock by parameters from getRepositories?
+
   return await octokit.paginate(
     octokit.rest.repos.listForUser,
     createRequestForUserRepos(user),
