@@ -11,5 +11,6 @@ export const getExpectedDataFor = async (account, repo) => {
 };
 
 export const getMockResponseForGetRepositories = async (account) => {
+  console.log("WORKING!");
   return await objectFromFile(`get-repos-for-${account}-response.json`);
 };

@@ -4,41 +4,32 @@ import {
   createRequestForUserRepos,
 } from "./octokit-utils";
 
-// gets a preconfigured instance of octokit
-const octokit = createOctokit();
-
-const getOrgRepositories = async (org) =>
+const getOrgRepositories = async (octokit, org) =>
   await octokit.paginate(
     octokit.rest.repos.listForOrg,
     createRequestForOrgRepos(org),
   );
 
-const getUserRepositories = async (user) => {
-  console.log("From getUserRepositories");
-  console.log(octokit);
-
-  // is jest module mocking enough to swap the implementation of the octokit?
-  // or should it pass the octokit mock by parameters from getRepositories?
-
+const getUserRepositories = async (octokit, user) => {
   return await octokit.paginate(
     octokit.rest.repos.listForUser,
     createRequestForUserRepos(user),
   );
 };
 
-const getRepositoriesForAccount = async (type, name) => {
+const getRepositoriesForAccount = async (octokit, type, name) => {
   try {
     let getter = type === "org" ? getOrgRepositories : getUserRepositories;
-    return await getter(name);
+    return await getter(octokit, name);
   } catch (error) {
     console.error(`Error fetching repositories for ${type} ${name}!`, error);
   }
   return Promise.resolve([]);
 };
 
-const processAccount = async ({ type, name, include }) =>
+const processAccount = async (octokit, { type, name, include }) =>
   new Promise(async (res) => {
-    let repositories = await getRepositoriesForAccount(type, name);
+    let repositories = await getRepositoriesForAccount(octokit, type, name);
     let filteredRepositories = repositories.filter(
       (r) => !include || include.includes(r.name),
     );
@@ -49,9 +40,16 @@ const processAccount = async ({ type, name, include }) =>
     res(filteredRepositories.map(formatRepositoryDataFor(name)));
   });
 
-export const getRepositories = async (accounts) => {
-  console.log(accounts);
-  return (await Promise.allSettled(accounts.map(processAccount)))
+export const getRepositories = async (
+  accounts,
+  { createOctokit = createOctokit },
+) => {
+  const octokit = await createOctokit();
+  return (
+    await Promise.allSettled(
+      accounts.map((account) => processAccount(octokit, account)),
+    )
+  )
     .map(({ value }) => value)
     .flat();
 };

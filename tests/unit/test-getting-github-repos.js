@@ -9,8 +9,7 @@ import { jest } from "@jest/globals";
 // in getUserRepositories (index.js), then a fixed dataset will be returned.
 const getMockDataForGetRepositories = (endpoint, parameters) => {
   if (parameters.type === "owner") {
-    console.log("In User");
-    console.log(endpoint);
+    console.log("In get Mock Data for Get Repositories (User)");
     return Promise.resolve(
       getMockResponseForGetRepositories(parameters.username),
     );
@@ -18,24 +17,32 @@ const getMockDataForGetRepositories = (endpoint, parameters) => {
   return Promise.resolve([]);
 };
 
-jest.unstable_mockModule("@octokit/rest", () => ({
-  Octokit: jest.fn().mockImplementation(() => ({
-    paginate: jest.fn().mockImplementation(getMockDataForGetRepositories),
-  })),
-}));
+jest.unstable_mockModule("@octokit/rest", () => {
+  const original = jest.requireActual("@octokit/rest");
+  console.log("MOCKING OCTOKIT");
+  return {
+    ...original,
+    Octokit: jest.fn().mockImplementation(() => {
+      return {
+        ...new original.Octokit(),
+        paginate: jest.fn().mockImplementation(getMockDataForGetRepositories),
+      };
+    }),
+  };
+});
+
+const createMockOctokit = async () => {
+  const { Octokit } = await import("@octokit/rest");
+  return new Octokit();
+};
 
 describe("Test getting GitHub repos", () => {
-  it("returns mock data", async () => {
-    // just trying to figure out what's going on with the mock.
-    const { Octokit } = await import("@octokit/rest");
-    console.log(Octokit);
-    console.log(Octokit.getMockImplementation());
-  });
-
   test("get all user repos", async () => {
     const accounts = [{ name: "user1", type: "user" }];
 
-    const repositories = getRepositories(accounts);
+    const repositories = getRepositories(accounts, {
+      createOctokit: createMockOctokit,
+    });
     expect(repositories).toHaveLength(2);
     repositories.forEach((repository) => {
       expect(repository).toMatchObject(getExpectedDataFor("user1", "repo-a"));
