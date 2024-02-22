@@ -3,7 +3,7 @@
 import fs from "fs/promises";
 
 const objectFromFile = async (path) => {
-  return JSON.parse(await fs.readFile(path, "utf8"));
+  return JSON.parse(await fs.readFile(`./tests/data/${path}`, "utf8"));
 };
 
 export const getExpectedDataFor = async (account, repo) => {
@@ -11,6 +11,5 @@ export const getExpectedDataFor = async (account, repo) => {
 };
 
 export const getMockResponseForGetRepositories = async (account) => {
-  console.log("WORKING!");
   return await objectFromFile(`get-repos-for-${account}-response.json`);
 };
