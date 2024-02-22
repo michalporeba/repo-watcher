@@ -7,7 +7,7 @@
   "scripts": {
     "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/unit/",
     "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/integration/",
-    "test": "npm run test:unit && npm run test:integration"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/"
   },
   "keywords": [],
   "author": "michalporeba@gmail.com",
