@@ -1,5 +1,6 @@
 "use strict";
 
+import { Octokit } from "@octokit/rest";
 /*
  * The purpose of these integration tests is to catch any changes to API returns
  * that can case the repo-watcher to stop working in the future.
@@ -85,7 +86,7 @@ const validateRepoResponseShape = (data) => {
   });
 };
 
-const octokit = createOctokit();
+const octokit = await createOctokit();
 
 describe("GitHub API responses", () => {
   test("user repos have necessary properties and values", async () => {

@@ -28,7 +28,8 @@
       "<rootDir>/tests"
     ],
     "testMatch": [
-      "**/tests/**/*.js"
+      "**/tests/integration/**/*.js",
+      "**/tests/unit/**/*.js"
     ],
     "collectCoverage": true,
     "collectCoverageFrom": [
