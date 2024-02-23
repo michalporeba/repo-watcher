@@ -95,11 +95,11 @@ describe("GitHub API responses", () => {
     );
 
     validateRepoResponseShape(data);
-  });
+  }, 10000);
 
   test("organisation repos have necessary properties and values", async () => {
     const { data } = await octokit.rest.repos.listForOrg(
       createRequestForOrgRepos("alphagov"),
     );
-  });
+  }, 10000);
 });

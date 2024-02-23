@@ -12,22 +12,15 @@ const getOrgRepositories = async (org, octokit) =>
     createRequestForOrgRepos(org),
   );
 
-const getUserRepositories = async (user, octokit) => {
-  return await octokit.paginate(
+const getUserRepositories = async (user, octokit) =>
+  await octokit.paginate(
     octokit.rest.repos.listForUser,
     createRequestForUserRepos(user),
   );
-};
 
 const getRepositoriesForAccount = async (type, name, octokit) => {
-  try {
-    let getter = type === "org" ? getOrgRepositories : getUserRepositories;
-    return await getter(name, octokit);
-  } catch (error) {
-    console.error(`Error fetching repositories for ${type} ${name}!`, error);
-  }
-
-  return Promise.resolve([]);
+  let getter = type === "org" ? getOrgRepositories : getUserRepositories;
+  return await getter(name, octokit);
 };
 
 const processAccount = async ({ type, name, include }, octokit) =>
