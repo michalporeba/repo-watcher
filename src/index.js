@@ -45,6 +45,18 @@ const formatRepositoryDataFor = (account) => (repo) => ({
     updated: repo.updated_at,
     pushed: repo.pushed_at,
   },
+  blobs: {
+    description: repo.description || "(missing)",
+  },
+  counts: {
+    forks: repo.forks,
+    openIssues: repo.open_issues,
+    watchers: repo.watchers,
+  },
+  license: {
+    name: repo?.license?.name || "(missing)",
+    spdxId: repo?.license?.spdx_id || "(missing)",
+  },
   properties: {
     isArchived: repo.archived,
     isDisabled: repo.disabled,
@@ -57,20 +69,8 @@ const formatRepositoryDataFor = (account) => (repo) => ({
     hasPages: repo.has_pages,
     hasDiscussions: repo.has_discussions,
   },
-  license: {
-    name: repo?.license?.name || "(missing)",
-    spdxId: repo?.license?.spdx_id || "(missing)",
-  },
-  counts: {
-    forks: repo.forks,
-    openIssues: repo.open_issues,
-    watchers: repo.watchers,
-  },
   topLanguage: repo.language,
   topics: repo.topics,
-  blobs: {
-    description: repo.description,
-  },
 });
 
 export const getRepositories = async (accounts, config = {}) => {

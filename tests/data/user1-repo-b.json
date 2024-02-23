@@ -10,6 +10,9 @@
     "updated": "2024-02-19T13:14:23Z",
     "pushed": "2024-02-28T18:44:08Z"
   },
+  "blobs": {
+    "description": "A test project by user1"
+  },
   "license": {
     "name": "(missing)",
     "spdxId": "(missing)"

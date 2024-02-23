@@ -10,6 +10,9 @@
     "updated": "2023-05-23T10:23:33Z",
     "pushed": "2024-01-21T23:37:11Z"
   },
+  "blobs": {
+    "description": "(missing)"
+  },
   "license": {
     "name": "MIT License",
     "spdxId": "MIT"
