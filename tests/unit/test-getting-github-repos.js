@@ -35,13 +35,26 @@ const createMockOctokit = async () => {
 describe("Test getting GitHub repos", () => {
   test("get all user repos", async () => {
     const accounts = [{ name: "user1", type: "user" }];
+    const expectations = [
+      await getExpectedDataFor("user1", "repo-a"),
+      await getExpectedDataFor("user1", "repo-b"),
+    ];
     const config = { createOctokit: createMockOctokit };
-    const repositories = await getRepositories(accounts, config);
+    let repositories = await getRepositories(accounts, config);
+    let matched = [];
 
-    expect(repositories).toHaveLength(2);
-
-    repositories.forEach((r) => {
-      expect(r).toMatchObject(getExpectedDataFor(r.account, r.name));
+    expectations.forEach((expected) => {
+      const i = repositories.findIndex(
+        (r) => expected.account === r.account && expected.name == r.name,
+      );
+      if (i >= 0) {
+        expect(repositories[i]).toMatchObject(expected);
+        matched.push(expected);
+        repositories.splice(i, 1);
+      }
     });
+
+    expect(repositories).toHaveLength(0);
+    expect(matched).toEqual(expectations);
   });
 });

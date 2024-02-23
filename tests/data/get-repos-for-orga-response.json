@@ -1,0 +1,39 @@
+[
+  {
+    "id": 655721801,
+    "node_id": "D_dms43f",
+    "name": "repo-1",
+    "owner": {
+      "login": "orga",
+      "html_url": "https://github.com/orga"
+    },
+    "html_url": "https://github.com/muser1/repo-a",
+    "description": null,
+    "fork": true,
+    "created_at": "2023-05-23T10:23:33Z",
+    "updated_at": "2023-05-23T10:23:33Z",
+    "pushed_at": "2024-01-21T23:37:11Z",
+    "homepage": "https://orga.github.io/repo-1/",
+    "size": 123,
+    "language": "Python",
+    "has_issues": false,
+    "has_projects": true,
+    "has_downloads": true,
+    "has_wiki": false,
+    "has_pages": false,
+    "has_discussions": false,
+    "forks_count": 0,
+    "archived": false,
+    "disabled": false,
+    "license": {
+      "name": "MIT License",
+      "spdx_id": "MIT"
+    },
+    "is_template": false,
+    "default_branch": "master",
+    "topics": [],
+    "forks": 1,
+    "open_issues": 2,
+    "watchers": 3
+  }
+]
