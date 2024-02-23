@@ -48,3 +48,22 @@ your involvement is welcome. Here's how you can get started:
 
 &nbsp;
 _Let's make public code more accessible, usable, and impactful._
+
+&nbsp;
+
+# Testing
+
+The testing is done using [jest](https://jestjs.io/).
+To execute integration tests you will need a GitHub API token stored in `GITHUB_TOKEN` environmental variable. Once this is set up, you can do:
+
+```bash
+npm install
+npm run test
+```
+
+It is possible to execute unit and integration tests separatly like so:
+
+```bash
+npm run test:unit
+npm run test:integration
+```
