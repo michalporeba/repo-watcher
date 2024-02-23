@@ -35,9 +35,11 @@ const processAccount = async ({ type, name, include }, octokit) =>
 
 const formatRepositoryDataFor = (account) => (repo) => ({
   account: account,
-  name: repo.name,
-  homepage: repo.homepage,
   owner: repo.owner.login,
+  name: repo.name,
+  url: repo.html_url,
+  homepage: repo.homepage,
+  size: repo.size,
   times: {
     created: repo.created_at,
     updated: repo.updated_at,
@@ -59,7 +61,6 @@ const formatRepositoryDataFor = (account) => (repo) => ({
     name: repo.license ? repo.license.name : null,
     url: repo.license ? repo.license.url : null,
   },
-  size: repo.size,
   counts: {
     forks: repo.forks,
     openIssues: repo.open_issues,

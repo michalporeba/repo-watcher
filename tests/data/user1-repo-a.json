@@ -1,4 +1,8 @@
 {
   "account": "user1",
-  "name": "repo-a"
+  "owner": "user1",
+  "name": "repo-a",
+  "url": "https://github.com/user1/repo-a",
+  "homepage": "",
+  "size": 343
 }
