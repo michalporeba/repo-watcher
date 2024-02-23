@@ -67,3 +67,22 @@ It is possible to execute unit and integration tests separatly like so:
 npm run test:unit
 npm run test:integration
 ```
+
+# Usage
+
+```javascript
+import { getRepositories } from "repo-watcher";
+
+const account = [
+  { name: "alphagov", type: "org" },
+  {
+    name: "michalporeba",
+    type: "user",
+    inlcude: ["repo-watcher", "x-gov-repos"],
+  },
+];
+const repositories = await getRepositories(accounts);
+console.log(repositories);
+```
+
+The above will return all `alphagov` repositories and two specific repositories by `michaporeba`.
