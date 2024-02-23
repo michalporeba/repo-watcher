@@ -38,7 +38,7 @@ const formatRepositoryDataFor = (account) => (repo) => ({
   owner: repo.owner.login,
   name: repo.name,
   url: repo.html_url,
-  homepage: repo.homepage,
+  homepage: repo.homepage || "(missing)",
   size: repo.size,
   times: {
     created: repo.created_at,
@@ -58,8 +58,8 @@ const formatRepositoryDataFor = (account) => (repo) => ({
     hasDiscussions: repo.has_discussions,
   },
   license: {
-    name: repo.license ? repo.license.name : null,
-    url: repo.license ? repo.license.url : null,
+    name: repo?.license?.name || "(missing)",
+    spdxId: repo?.license?.spdx_id || "(missing)",
   },
   counts: {
     forks: repo.forks,

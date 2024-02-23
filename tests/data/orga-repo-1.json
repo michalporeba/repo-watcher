@@ -4,5 +4,14 @@
   "name": "repo-1",
   "url": "https://github.com/orga/repo-1",
   "homepage": "https://orga.github.io/repo-1/",
-  "size": 123
+  "size": 123,
+  "times": {
+    "created": "2023-05-23T10:23:33Z",
+    "updated": "2023-05-23T10:23:33Z",
+    "pushed": "2024-01-21T23:37:11Z"
+  },
+  "license": {
+    "name": "MIT License",
+    "spdxId": "MIT"
+  }
 }

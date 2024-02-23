@@ -3,6 +3,15 @@
   "owner": "user1",
   "name": "repo-a",
   "url": "https://github.com/user1/repo-a",
-  "homepage": "",
-  "size": 343
+  "homepage": "(missing)",
+  "size": 343,
+  "times": {
+    "created": "2023-06-19T13:14:27Z",
+    "updated": "2023-06-19T13:14:28Z",
+    "pushed": "2023-04-28T18:44:08Z"
+  },
+  "license": {
+    "name": "Custom Stuff",
+    "spdxId": "(missing)"
+  }
 }

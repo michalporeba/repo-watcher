@@ -3,6 +3,15 @@
   "owner": "user1",
   "name": "repo-b",
   "url": "https://github.com/user1/repo-b",
-  "homepage": null,
-  "size": 222
+  "homepage": "(missing)",
+  "size": 222,
+  "times": {
+    "created": "2024-02-19T13:14:22Z",
+    "updated": "2024-02-19T13:14:23Z",
+    "pushed": "2024-02-28T18:44:08Z"
+  },
+  "license": {
+    "name": "(missing)",
+    "spdxId": "(missing)"
+  }
 }
