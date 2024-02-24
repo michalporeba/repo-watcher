@@ -4,6 +4,7 @@
   "name": "repo-a",
   "url": "https://github.com/user1/repo-a",
   "homepage": "(missing)",
+  "default_branch": "master",
   "size": 343,
   "times": {
     "created": "2023-06-19T13:14:27Z",
@@ -13,8 +14,26 @@
   "blobs": {
     "description": "(missing)"
   },
+  "counts": {
+    "forks": 5,
+    "openIssues": 7,
+    "watchers": 11
+  },
   "license": {
     "name": "Custom Stuff",
     "spdxId": "(missing)"
-  }
+  },
+  "properties": {
+    "isArchived": false,
+    "isDisabled": false,
+    "isFork": true,
+    "isTemplate": false,
+    "hasDiscussions": false,
+    "hasDownloads": true,
+    "hasIssues": false,
+    "hasPages": false,
+    "hasProjects": true,
+    "hasWiki": false
+  },
+  "topLanguage": "JavaScript"
 }

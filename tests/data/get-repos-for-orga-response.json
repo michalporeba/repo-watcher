@@ -22,7 +22,6 @@
     "has_wiki": false,
     "has_pages": false,
     "has_discussions": false,
-    "forks_count": 0,
     "archived": false,
     "disabled": false,
     "license": {
@@ -30,7 +29,7 @@
       "spdx_id": "MIT"
     },
     "is_template": false,
-    "default_branch": "master",
+    "default_branch": "main",
     "topics": [],
     "forks": 1,
     "open_issues": 2,

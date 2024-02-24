@@ -4,6 +4,7 @@
   "name": "repo-1",
   "url": "https://github.com/orga/repo-1",
   "homepage": "https://orga.github.io/repo-1/",
+  "default_branch": "main",
   "size": 123,
   "times": {
     "created": "2023-05-23T10:23:33Z",
@@ -13,8 +14,26 @@
   "blobs": {
     "description": "(missing)"
   },
+  "counts": {
+    "forks": 1,
+    "openIssues": 2,
+    "watchers": 3
+  },
   "license": {
     "name": "MIT License",
     "spdxId": "MIT"
-  }
+  },
+  "properties": {
+    "isArchived": false,
+    "isDisabled": false,
+    "isFork": true,
+    "isTemplate": false,
+    "hasDiscussions": false,
+    "hasDownloads": true,
+    "hasIssues": false,
+    "hasPages": false,
+    "hasProjects": true,
+    "hasWiki": false
+  },
+  "topLanguage": "Python"
 }

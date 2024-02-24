@@ -4,6 +4,7 @@
   "name": "repo-b",
   "url": "https://github.com/user1/repo-b",
   "homepage": "(missing)",
+  "default_branch": "main",
   "size": 222,
   "times": {
     "created": "2024-02-19T13:14:22Z",
@@ -13,8 +14,26 @@
   "blobs": {
     "description": "A test project by user1"
   },
+  "counts": {
+    "forks": 3,
+    "openIssues": 5,
+    "watchers": 8
+  },
   "license": {
     "name": "(missing)",
     "spdxId": "(missing)"
-  }
+  },
+  "properties": {
+    "isArchived": true,
+    "isDisabled": true,
+    "isFork": false,
+    "isTemplate": true,
+    "hasDiscussions": true,
+    "hasDownloads": false,
+    "hasIssues": true,
+    "hasPages": true,
+    "hasProjects": false,
+    "hasWiki": true
+  },
+  "topLanguage": "Gleam"
 }
