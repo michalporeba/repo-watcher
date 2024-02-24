@@ -41,8 +41,9 @@ your involvement is welcome. Here's how you can get started:
   Get involved if you have ideas on how to improve what we should capture about the repositories by [starting a discussion](https://github.com/michalporeba/repo-watcher/issues).
 - **Contributing**: This, itself, is a public code, open-source software.
   Your contributions are invaluable! Whether it's code, documentation, testing, or issue reporting, every bit helps.
-- **Using repo-watcher**: We are not quite there yet.
-  But we will soon. If you have ideas of what this project can enable you to do, consider the above two points.
+- **Using repo-watcher**: The functionality is limited, but it is there.
+  Try it using the examples below.
+  If you have ideas of what this project can enable you to do, consider the above two points. Let's discuss what you think would be useful.
 - **Feedback**: Have suggestions or feedback?
   Please share them in [issues](https://github.com/michalporeba/repo-watcher/issues), or by contacting [Michał](https://github.com/michalporeba).
 
