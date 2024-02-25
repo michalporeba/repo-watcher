@@ -1,5 +1,6 @@
 "use strict";
 
+import { getMockResponseForGetRepositories } from "../tests/data/test-data-utils";
 import {
   createOctokit as createDefaultOctokit,
   createRequestForOrgRepos,
@@ -18,22 +19,26 @@ const getUserRepositories = async (user, octokit) =>
     createRequestForUserRepos(user),
   );
 
-const getRepositoriesForAccount = async (type, name, octokit) => {
+const getRepositoriesForAccount = async function* (type, name, octokit) {
   let getter = type === "org" ? getOrgRepositories : getUserRepositories;
-  return await getter(name, octokit);
+  const repositories = await getter(name, octokit);
+  for (let repository of repositories) {
+    yield repository;
+  }
 };
 
-const processAccount = async ({ type, name, include }, octokit) =>
-  new Promise(async (res) => {
-    const repositories = await getRepositoriesForAccount(type, name, octokit);
-    const filteredRepositories = repositories.filter(
-      (r) => !include || include.includes(r.name),
-    );
+const processAccount = async function* ({ type, name, include }, octokit) {
+  const formatter = createRepositoryDataFormatterFor(name);
+  const repositories = getRepositoriesForAccount(type, name, octokit);
 
-    res(filteredRepositories.map(formatRepositoryDataFor(name)));
-  });
+  for await (let repository of repositories) {
+    if (!include || include.includes(repository.name)) {
+      yield formatter(repository);
+    }
+  }
+};
 
-const formatRepositoryDataFor = (account) => (repo) => ({
+const createRepositoryDataFormatterFor = (account) => (repo) => ({
   account: account,
   owner: repo.owner.login,
   name: repo.name,
@@ -74,12 +79,20 @@ const formatRepositoryDataFor = (account) => (repo) => ({
   topics: repo.topics,
 });
 
-export const getRepositories = async (accounts, config = {}) => {
+export const streamRepositories = async function* (accounts, config = {}) {
   const { createOctokit = createDefaultOctokit } = config;
   const octokit = await createOctokit();
-  const all = await Promise.allSettled(
-    accounts.map((account) => processAccount(account, octokit)),
-  );
+  for (const account of accounts) {
+    yield* processAccount(account, octokit);
+  }
+};
 
-  return all.map(({ value }) => value).flat();
+export const getRepositories = async (accounts, config) => {
+  const repositories = [];
+
+  for await (const repository of streamRepositories(accounts, config)) {
+    repositories.push(repository);
+  }
+
+  return repositories;
 };
