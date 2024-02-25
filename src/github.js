@@ -1,10 +1,6 @@
 "use strict";
 
-import {
-  createOctokit as createDefaultOctokit,
-  GITHUB_HEADERS,
-  GITHUB_PAGESIZE,
-} from "./github-utils";
+import { GITHUB_HEADERS, GITHUB_PAGESIZE } from "./github-utils";
 
 export const createRequestForOrgRepos = (org) => {
   return {

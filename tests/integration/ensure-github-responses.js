@@ -1,6 +1,5 @@
 "use strict";
 
-import { Octokit } from "@octokit/rest";
 /*
  * The purpose of these integration tests is to catch any changes to API returns
  * that can case the repo-watcher to stop working in the future.
