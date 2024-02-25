@@ -7,11 +7,11 @@ import { Octokit } from "@octokit/rest";
  * The checks goes beyond ensuring a property exists.
  */
 
+import { createOctokit } from "../../src/github-utils.js";
 import {
-  createOctokit,
   createRequestForUserRepos,
   createRequestForOrgRepos,
-} from "../../src/octokit-utils.js";
+} from "../../src/github.js";
 
 const NON_EMPTY_STRING_REGEX = /.+/;
 const URL_REGEX =
