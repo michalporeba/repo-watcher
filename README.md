@@ -82,8 +82,27 @@ const account = [
     inlcude: ["repo-watcher", "x-gov-repos"],
   },
 ];
+
 const repositories = await getRepositories(accounts);
 console.log(repositories);
 ```
 
-The above will return all `alphagov` repositories and two specific repositories by `michaporeba`.
+The above will return all `alphagov` repositories and two specific repositories by `michaporeba`. This approach will work for small number of accounts and repositories.
+However, if you want to proces larger numbers, consider using the `streamRepositories` generator like so:
+
+```javascript
+import { streamRepositories } from "repo-watcher";
+
+const account = [
+  { name: "alphagov", type: "org" },
+  {
+    name: "michalporeba",
+    type: "user",
+    inlcude: ["repo-watcher", "x-gov-repos"],
+  },
+];
+
+for await (let repository in streamRepositories(accounts)) {
+  console.log(repository);
+}
+```
