@@ -6,11 +6,12 @@
  * The checks goes beyond ensuring a property exists.
  */
 
-import { createOctokit } from "../../src/github-utils.js";
+import { createOctokit } from "../../src/github-utils";
 import {
   createRequestForUserRepos,
   createRequestForOrgRepos,
-} from "../../src/github.js";
+} from "../../src/github";
+import customJestExtensions from "../data/jest-extensions";
 
 const NON_EMPTY_STRING_REGEX = /.+/;
 const URL_REGEX =
@@ -18,37 +19,7 @@ const URL_REGEX =
 const DATETIME_REGEX =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
 
-expect.extend({
-  toBeNullOrString(value) {
-    return {
-      message: () => `expected ${value} to be null or a string`,
-      pass: value === null || typeof value === "string",
-    };
-  },
-  toBeUndefinedOrString(value) {
-    return {
-      message: () => `expected ${value} to be null or a string`,
-      pass: value === undefined || typeof value === "string",
-    };
-  },
-  toBeNullOrMatch(value, pattern) {
-    return {
-      message: () => `expected ${value} to be null or to match ${pattern}`,
-      pass:
-        value === null || (typeof value === "string" && !!value.match(pattern)),
-    };
-  },
-  toBeNullEmptyOrMatch(value, pattern) {
-    return {
-      message: () =>
-        `expected ${value} to be null, an empty string or to match ${pattern}`,
-      pass:
-        value === null ||
-        value === "" ||
-        (typeof value === "string" && !!value.match(pattern)),
-    };
-  },
-});
+expect.extend(customJestExtensions);
 
 const EXPECTED_REPO_RESPONSE_SHAPE = {
   name: expect.stringMatching(NON_EMPTY_STRING_REGEX),

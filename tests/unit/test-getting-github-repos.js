@@ -2,24 +2,15 @@
 
 import { getRepositories } from "../../src/index";
 import {
+  createMockOctokit,
   getExpectedDataFor,
-  getMockResponseForGetRepositories,
+  getMockDataForGetRepositories,
+  repositoryComparator,
 } from "../data/test-data-utils";
 import { jest } from "@jest/globals";
+import customJestExtensions from "../data/jest-extensions";
 
-const getMockDataForGetRepositories = (_, parameters) => {
-  let account = "";
-  if (parameters?.type === "owner") {
-    account = parameters.username;
-  }
-  if (parameters?.type === "public") {
-    account = parameters.org;
-  }
-  if (account) {
-    return Promise.resolve(getMockResponseForGetRepositories(account));
-  }
-  throw "Incorrect API request";
-};
+expect.extend(customJestExtensions);
 
 jest.unstable_mockModule("@octokit/rest", () => {
   const actual = jest.requireActual("@octokit/rest");
@@ -32,34 +23,6 @@ jest.unstable_mockModule("@octokit/rest", () => {
   };
 });
 
-const createMockOctokit = async () => {
-  const { Octokit } = await import("@octokit/rest");
-  return new Octokit();
-};
-
-const testReturnedData = async (expectations, actuals) => {
-  let matched = [];
-
-  expectations.forEach((expected) => {
-    const i = actuals.findIndex(
-      (actual) =>
-        expected.account === actual.account && expected.name == actual.name,
-    );
-
-    if (i >= 0) {
-      // result was found, check if it is in the right shape
-      expect(actuals[i]).toMatchObject(expected);
-      matched.push(expected);
-      actuals.splice(i, 1);
-    }
-  });
-
-  // nothing should be included unexpectadly
-  expect(actuals).toHaveLength(0);
-  // and everything expected should be returned
-  expect(matched).toEqual(expectations);
-};
-
 describe("Test getting GitHub repos", () => {
   test("get all user repos", async () => {
     const accounts = [{ name: "user1", type: "user" }];
@@ -69,7 +32,7 @@ describe("Test getting GitHub repos", () => {
     ];
     const config = { createOctokit: createMockOctokit };
     const actuals = await getRepositories(accounts, config);
-    await testReturnedData(expectations, actuals);
+    expect(actuals).toCloselyMatch(expectations, repositoryComparator);
   });
 
   test("get specific user repo", async () => {
@@ -77,7 +40,7 @@ describe("Test getting GitHub repos", () => {
     const expectations = [await getExpectedDataFor("user1", "repo-b")];
     const config = { createOctokit: createMockOctokit };
     const actuals = await getRepositories(accounts, config);
-    await testReturnedData(expectations, actuals);
+    expect(actuals).toCloselyMatch(expectations, repositoryComparator);
   });
 
   test("get all org repos", async () => {
@@ -85,7 +48,7 @@ describe("Test getting GitHub repos", () => {
     const expectations = [await getExpectedDataFor("orga", "repo-1")];
     const config = { createOctokit: createMockOctokit };
     const actuals = await getRepositories(accounts, config);
-    await testReturnedData(expectations, actuals);
+    expect(actuals).toCloselyMatch(expectations, repositoryComparator);
   });
 
   test("get all repos", async () => {
@@ -100,6 +63,6 @@ describe("Test getting GitHub repos", () => {
     ];
     const config = { createOctokit: createMockOctokit };
     const actuals = await getRepositories(accounts, config);
-    await testReturnedData(expectations, actuals);
+    expect(actuals).toCloselyMatch(expectations, repositoryComparator);
   });
 });
