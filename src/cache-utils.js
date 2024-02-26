@@ -1,6 +1,6 @@
 "use strict";
 
-import { mkdir, readFile, writeFile } from "fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "fs/promises";
 import pathtools from "path";
 
 export const createCache = async (config = {}) => {
@@ -11,10 +11,6 @@ export const createCache = async (config = {}) => {
     default:
       throw `Unknown cache type: ${type}`;
   }
-};
-
-const objectFromString = async (data) => {
-  return JSON.parse(await fs.readFile(`./tests/data/${path}`, "utf8"));
 };
 
 const createFileSystemCache = async (config) => {
@@ -30,7 +26,6 @@ const createFileSystemCache = async (config) => {
 
   const setValueAtKey = async (key, value) => {
     await ensureFolderExists(cacheRootPath);
-
     const data = JSON.stringify(value, null, 2);
     const file = pathtools.join(cacheRootPath, `${key}.json`);
     await writeFile(file, data);
@@ -39,11 +34,29 @@ const createFileSystemCache = async (config) => {
   const getValueFromKey = async (key) => {
     await ensureFolderExists(cacheRootPath);
     const file = pathtools.join(cacheRootPath, `${key}.json`);
-    return JSON.parse(await readFile(file, "utf8"));
+    try {
+      return JSON.parse(await readFile(file, "utf8"));
+    } catch {
+      // if file cannot be open, the value probably doesn't exist
+      return undefined;
+    }
+  };
+
+  const removeKey = async (key) => {
+    await ensureFolderExists(cacheRootPath);
+    const file = pathtools.join(cacheRootPath, `${key}.json`);
+    await unlink(file);
+  };
+
+  const updateKey = async (key, value) => {
+    const data = await getValueFromKey(key);
+    await setValueAtKey(key, { ...data, ...value });
   };
 
   return Promise.resolve({
     set: setValueAtKey,
     get: getValueFromKey,
+    remove: removeKey,
+    update: updateKey,
   });
 };
