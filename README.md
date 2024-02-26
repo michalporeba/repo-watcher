@@ -83,8 +83,8 @@ const account = [
   },
 ];
 
-const repositories = await getRepositories(accounts);
-console.log(repositories);
+const { data } = await getRepositories(accounts);
+console.log(data);
 ```
 
 The above will return all `alphagov` repositories and two specific repositories by `michaporeba`. This approach will work for small number of accounts and repositories.

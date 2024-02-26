@@ -31,24 +31,24 @@ describe("Test getting GitHub repos", () => {
       await getExpectedDataFor("user1", "repo-b"),
     ];
     const config = { createOctokit: createMockOctokit };
-    const actuals = await getRepositories(accounts, config);
-    expect(actuals).toCloselyMatch(expectations, repositoryComparator);
+    const { data } = await getRepositories(accounts, config);
+    expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
 
   test("get specific user repo", async () => {
     const accounts = [{ name: "user1", type: "user", include: "repo-b" }];
     const expectations = [await getExpectedDataFor("user1", "repo-b")];
     const config = { createOctokit: createMockOctokit };
-    const actuals = await getRepositories(accounts, config);
-    expect(actuals).toCloselyMatch(expectations, repositoryComparator);
+    const { data } = await getRepositories(accounts, config);
+    expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
 
   test("get all org repos", async () => {
     const accounts = [{ name: "orga", type: "org" }];
     const expectations = [await getExpectedDataFor("orga", "repo-1")];
     const config = { createOctokit: createMockOctokit };
-    const actuals = await getRepositories(accounts, config);
-    expect(actuals).toCloselyMatch(expectations, repositoryComparator);
+    const { data } = await getRepositories(accounts, config);
+    expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
 
   test("get all repos", async () => {
@@ -62,7 +62,7 @@ describe("Test getting GitHub repos", () => {
       await getExpectedDataFor("orga", "repo-1"),
     ];
     const config = { createOctokit: createMockOctokit };
-    const actuals = await getRepositories(accounts, config);
-    expect(actuals).toCloselyMatch(expectations, repositoryComparator);
+    const { data } = await getRepositories(accounts, config);
+    expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
 });

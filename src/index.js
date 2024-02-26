@@ -10,7 +10,9 @@ export const getRepositories = async (accounts, config) => {
     repositories.push(repository);
   }
 
-  return repositories;
+  return {
+    data: repositories,
+  };
 };
 
 export const streamRepositories = async function* (accounts, config = {}) {
