@@ -52,7 +52,7 @@ _Let's make public code more accessible, usable, and impactful._
 
 &nbsp;
 
-# Testing
+# How to test?
 
 The testing is done using [jest](https://jestjs.io/).
 To execute integration tests you will need a GitHub API token stored in `GITHUB_TOKEN` environmental variable. Once this is set up, you can do:
@@ -69,7 +69,10 @@ npm run test:unit
 npm run test:integration
 ```
 
-# Usage
+# How to use?
+
+The functionality is very limited at the moment, but it is there and working.
+At the moment it possible to get repos from a list of accounts. Give it a go!
 
 ```javascript
 import { getRepositories } from "repo-watcher";
@@ -106,3 +109,20 @@ for await (let repository in streamRepositories(accounts)) {
   console.log(repository);
 }
 ```
+
+# Configuration and extensions
+
+All public methods will accept a `config` object as their last, optional parameter to alter and extend their behaviour.
+The configuration supports the following options at the moment:
+
+| Property      | Type     | Description                                                                                                                                    |
+| ------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| createOctokit | function | A factory method creating instance of [Octokit](https://github.com/octokit/octokit.js). It can be used to customise GitHub API client creation |
+| cache         | object   | Configuration for the caching systems to persist information between function calls                                                            |
+
+## cache
+
+| Property | Type   | Description                                                                                |
+| -------- | ------ | ------------------------------------------------------------------------------------------ |
+| type     | string | The type of the cache. Currently the only supported value is "fs" - the local file system. |
+| path     | string | used by file system cache, the path at which the local data should be stored.              |
