@@ -13,6 +13,15 @@ export const createCache = async (config = {}) => {
   }
 };
 
+const toFolderAndFile = (base, path) => {
+  const fullPath = pathtools.join(base, path);
+  return {
+    fullPath: fullPath,
+    folder: pathtools.dirname(fullPath),
+    filename: pathtools.basename(fullPath),
+  };
+};
+
 const createFileSystemCache = async (config) => {
   const cacheRootPath = config?.path || "cache";
 
@@ -25,17 +34,17 @@ const createFileSystemCache = async (config) => {
   };
 
   const setValueAtKey = async (key, value) => {
-    await ensureFolderExists(cacheRootPath);
+    const { fullPath, folder } = toFolderAndFile(cacheRootPath, `${key}.json`);
+    await ensureFolderExists(folder);
     const data = JSON.stringify(value, null, 2);
-    const file = pathtools.join(cacheRootPath, `${key}.json`);
-    await writeFile(file, data);
+    await writeFile(fullPath, data);
   };
 
   const getValueFromKey = async (key) => {
-    await ensureFolderExists(cacheRootPath);
-    const file = pathtools.join(cacheRootPath, `${key}.json`);
+    const { fullPath, folder } = toFolderAndFile(cacheRootPath, `${key}.json`);
+    await ensureFolderExists(folder);
     try {
-      return JSON.parse(await readFile(file, "utf8"));
+      return JSON.parse(await readFile(fullPath, "utf8"));
     } catch {
       // if file cannot be open, the value probably doesn't exist
       return undefined;
@@ -43,9 +52,13 @@ const createFileSystemCache = async (config) => {
   };
 
   const removeKey = async (key) => {
-    await ensureFolderExists(cacheRootPath);
-    const file = pathtools.join(cacheRootPath, `${key}.json`);
-    await unlink(file);
+    const { fullPath, folder } = toFolderAndFile(cacheRootPath, `${key}.json`);
+    await ensureFolderExists(folder);
+    try {
+      await unlink(fullPath);
+    } catch {
+      // most likely the file doesn't exist, so that's OK
+    }
   };
 
   const updateKey = async (key, value) => {
