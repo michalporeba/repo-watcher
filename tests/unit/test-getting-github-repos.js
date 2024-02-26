@@ -23,6 +23,8 @@ jest.unstable_mockModule("@octokit/rest", () => {
   };
 });
 
+const config = { createOctokit: createMockOctokit };
+
 describe("Test getting GitHub repos", () => {
   test("get all user repos", async () => {
     const accounts = [{ name: "user1", type: "user" }];
@@ -30,7 +32,6 @@ describe("Test getting GitHub repos", () => {
       await getExpectedDataFor("user1", "repo-a"),
       await getExpectedDataFor("user1", "repo-b"),
     ];
-    const config = { createOctokit: createMockOctokit };
     const { data } = await getRepositories(accounts, config);
     expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
@@ -38,7 +39,6 @@ describe("Test getting GitHub repos", () => {
   test("get specific user repo", async () => {
     const accounts = [{ name: "user1", type: "user", include: "repo-b" }];
     const expectations = [await getExpectedDataFor("user1", "repo-b")];
-    const config = { createOctokit: createMockOctokit };
     const { data } = await getRepositories(accounts, config);
     expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
@@ -46,7 +46,6 @@ describe("Test getting GitHub repos", () => {
   test("get all org repos", async () => {
     const accounts = [{ name: "orga", type: "org" }];
     const expectations = [await getExpectedDataFor("orga", "repo-1")];
-    const config = { createOctokit: createMockOctokit };
     const { data } = await getRepositories(accounts, config);
     expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
@@ -61,7 +60,6 @@ describe("Test getting GitHub repos", () => {
       await getExpectedDataFor("user1", "repo-b"),
       await getExpectedDataFor("orga", "repo-1"),
     ];
-    const config = { createOctokit: createMockOctokit };
     const { data } = await getRepositories(accounts, config);
     expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
