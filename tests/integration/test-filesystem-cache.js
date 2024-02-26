@@ -21,12 +21,12 @@ describe("Test file system cache", () => {
     expect(await cache.get(key)).toMatchObject(data);
 
     await cache.update(key, { label: "pedwardeg dau", translated: true });
-
     expect(await cache.get(key)).toMatchObject(translated);
 
     await cache.remove(key);
     expect(await cache.get(key)).toBeUndefined();
   });
+
   test("Custom cache and key work too", async () => {
     const primaryCache = await createCache({ type: "fs" });
     const secondaryCache = await createCache({

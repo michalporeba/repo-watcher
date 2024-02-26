@@ -5,6 +5,7 @@ import pathtools from "path";
 
 export const createCache = async (config = {}) => {
   const { type = "fs" } = config;
+
   switch (type) {
     case "fs":
       return await createFileSystemCache(config);
@@ -23,14 +24,10 @@ const toFolderAndFile = (base, path) => {
 };
 
 const createFileSystemCache = async (config) => {
-  const cacheRootPath = config?.path || "cache";
+  const cacheRootPath = config?.path ?? "cache";
 
   const ensureFolderExists = async (path) => {
-    try {
-      await mkdir(path, { recursive: true });
-    } catch (error) {
-      console.error(`Error creating folder ${path}:`, error);
-    }
+    await mkdir(path, { recursive: true });
   };
 
   const setValueAtKey = async (key, value) => {
@@ -41,9 +38,8 @@ const createFileSystemCache = async (config) => {
   };
 
   const getValueFromKey = async (key) => {
-    const { fullPath, folder } = toFolderAndFile(cacheRootPath, `${key}.json`);
-    await ensureFolderExists(folder);
     try {
+      const { fullPath } = toFolderAndFile(cacheRootPath, `${key}.json`);
       return JSON.parse(await readFile(fullPath, "utf8"));
     } catch {
       // if file cannot be open, the value probably doesn't exist
@@ -52,9 +48,8 @@ const createFileSystemCache = async (config) => {
   };
 
   const removeKey = async (key) => {
-    const { fullPath, folder } = toFolderAndFile(cacheRootPath, `${key}.json`);
-    await ensureFolderExists(folder);
     try {
+      const { fullPath } = toFolderAndFile(cacheRootPath, `${key}.json`);
       await unlink(fullPath);
     } catch {
       // most likely the file doesn't exist, so that's OK

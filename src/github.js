@@ -2,23 +2,19 @@
 
 import { GITHUB_HEADERS, GITHUB_PAGESIZE } from "./github-utils";
 
-export const createRequestForOrgRepos = (org) => {
-  return {
-    org: org,
-    type: "public",
-    per_page: GITHUB_PAGESIZE,
-    headers: GITHUB_HEADERS,
-  };
-};
+export const createRequestForOrgRepos = (org) => ({
+  org,
+  type: "public",
+  per_page: GITHUB_PAGESIZE,
+  headers: GITHUB_HEADERS,
+});
 
-export const createRequestForUserRepos = (username) => {
-  return {
-    username: username,
-    type: "owner",
-    per_page: GITHUB_PAGESIZE,
-    headers: GITHUB_HEADERS,
-  };
-};
+export const createRequestForUserRepos = (username) => ({
+  username,
+  type: "owner",
+  per_page: GITHUB_PAGESIZE,
+  headers: GITHUB_HEADERS,
+});
 
 export const streamRepositoriesFromGitHubAccount = async function* (
   { type, name, include },
@@ -55,7 +51,7 @@ const getUserRepositories = async (user, octokit) =>
   );
 
 const createRepositoryDataFormatterFor = (account) => (repo) => ({
-  account: account,
+  account,
   owner: repo.owner.login,
   name: repo.name,
   url: repo.html_url,
