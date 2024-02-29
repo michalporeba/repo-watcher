@@ -8,7 +8,24 @@ export const GITHUB_HEADERS = {
 };
 
 export const createOctokit = async () => {
-  return new Octokit({
+  const CustomOctokit = Octokit.plugin(rateLimitsPlugin);
+  return new CustomOctokit({
     auth: process.env.GITHUB_TOKEN,
   });
+};
+
+const rateLimitsPlugin = (octokit, options) => {
+  // hook into the request lifecycle
+  octokit.hook.wrap("request", async (request, options) => {
+    const response = await request(options);
+    octokit.remainingRateLimit = parseInt(
+      response.headers["x-ratelimit-remaining"],
+    );
+    return response;
+  });
+
+  return {
+    remainingRateLimit: null,
+    getRemainingRateLimit: () => octokit.remainingRateLimit,
+  };
 };
