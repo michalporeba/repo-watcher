@@ -18,14 +18,15 @@ const rateLimitsPlugin = (octokit, options) => {
   // hook into the request lifecycle
   octokit.hook.wrap("request", async (request, options) => {
     const response = await request(options);
-    octokit.remainingRateLimit = parseInt(
-      response.headers["x-ratelimit-remaining"],
-    );
+    octokit.rate = {
+      remaining: parseInt(response.headers["x-ratelimit-remaining"]),
+    };
+
     return response;
   });
 
   return {
     remainingRateLimit: null,
-    getRemainingRateLimit: () => octokit.remainingRateLimit,
+    getRateInfo: () => octokit.rate,
   };
 };
