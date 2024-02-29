@@ -14,6 +14,6 @@ const resolveConfig = async (config, factory) => {
 export const resolveDefaultsFor = async (config) => {
   return {
     cache: await resolveConfig(config?.cache, createDefaultCache),
-    octokit: await createDefaultOctokit(),
+    octokit: await resolveConfig(config?.octokit, createDefaultOctokit),
   };
 };

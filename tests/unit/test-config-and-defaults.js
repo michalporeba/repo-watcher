@@ -53,4 +53,33 @@ describe("Test config default value resolution", () => {
       value: 42,
     });
   });
+
+  test("octokit value can be a factory method resolving to a constructed object", async () => {
+    const factory = async () => ({
+      value: "default",
+    });
+
+    const sut = await resolveDefaultsFor({ octokit: factory });
+    expect(sut.octokit).toMatchObject({
+      value: "default",
+    });
+  });
+
+  test("octokit can have a factory method", async () => {
+    const factory = async (config) => ({
+      value: config?.value || "default",
+    });
+
+    const test1 = await resolveDefaultsFor({ octokit: { create: factory } });
+    expect(test1.octokit).toMatchObject({
+      value: "default",
+    });
+
+    const test2 = await resolveDefaultsFor({
+      octokit: { create: factory, value: 42 },
+    });
+    expect(test2.octokit).toMatchObject({
+      value: 42,
+    });
+  });
 });
