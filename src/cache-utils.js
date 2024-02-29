@@ -9,10 +9,21 @@ export const createCache = async (config = {}) => {
   switch (type) {
     case "fs":
       return Promise.resolve(new FileSystemRepoCache(config));
+    case "noop":
+      return Promise.resolve(new NoopRepoCache());
     default:
       throw `Unknown cache type: ${type}`;
   }
 };
+
+export class NoopRepoCache {
+  async set(key, value) {}
+  async get(key) {
+    return null;
+  }
+  async update(key, value) {}
+  async remove(key) {}
+}
 
 export class FileSystemRepoCache {
   #cacheRootPath;

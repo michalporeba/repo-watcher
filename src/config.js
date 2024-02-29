@@ -5,7 +5,10 @@ const resolveConfig = async (config, factory) => {
   if (typeof config === "function") {
     return await config();
   }
-  return factory(config);
+  if (typeof config?.create === "function") {
+    return await config.create(config);
+  }
+  return await factory(config);
 };
 
 export const resolveDefaultsFor = async (config) => {
