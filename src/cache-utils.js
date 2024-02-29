@@ -12,10 +12,11 @@ export const createCache = async (config = {}) => {
     case "noop":
       return Promise.resolve(new NoopRepoCache());
     default:
-      throw `Unknown cache type: ${type}`;
+      return Promise.reject(new Error(`Unknown cache type: ${type}!`));
   }
 };
 
+// istanbul ignore next - it's just a no-operation implementation
 export class NoopRepoCache {
   async set(key, value) {}
   async get(key) {
@@ -70,7 +71,10 @@ export class FileSystemRepoCache {
 
   async remove(key) {
     try {
-      const { fullPath } = this.#toFolderAndFile(cacheRootPath, `${key}.json`);
+      const { fullPath } = this.#toFolderAndFile(
+        this.#cacheRootPath,
+        `${key}.json`,
+      );
       await unlink(fullPath);
     } catch {
       // most likely the file doesn't exist, so that's OK

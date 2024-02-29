@@ -4,8 +4,7 @@ import { createCache } from "../../src/cache-utils";
 
 describe("Test file system cache", () => {
   test("Ensure full value lifecycle is supported", async () => {
-    const config = { type: "fs" };
-    const cache = await createCache(config);
+    const cache = await createCache({ type: "fs" });
     const key = "test";
     const data = { value: 42, label: "fourty two" };
     const translated = {
