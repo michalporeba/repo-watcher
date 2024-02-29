@@ -10,7 +10,7 @@ export const getExpectedDataFor = async (account, repo) => {
   return await objectFromFile(`${account}-${repo}.json`);
 };
 
-export const getMockResponseForGetRepositories = async (account) => {
+export const getMockResponseForGetRepositories = async function (account) {
   return await objectFromFile(`get-repos-for-${account}-response.json`);
 };
 
@@ -26,6 +26,13 @@ export const getMockDataForGetRepositories = (_, parameters) => {
     return Promise.resolve(getMockResponseForGetRepositories(account));
   }
   throw "Incorrect API request";
+};
+
+export const getMockIteratorForGetRepositories = async function* (
+  _,
+  parameters,
+) {
+  yield getMockDataForGetRepositories(null, parameters);
 };
 
 export const repositoryComparator = (expected, actual) => {

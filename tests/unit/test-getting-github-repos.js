@@ -4,7 +4,7 @@ import { getRepositories } from "../../src/index";
 import {
   createMockOctokit,
   getExpectedDataFor,
-  getMockDataForGetRepositories,
+  getMockIteratorForGetRepositories,
   repositoryComparator,
 } from "../data/test-data-utils";
 import { jest } from "@jest/globals";
@@ -18,7 +18,11 @@ jest.unstable_mockModule("@octokit/rest", () => {
     ...actual,
     Octokit: jest.fn().mockImplementation(() => ({
       ...new actual.Octokit(),
-      paginate: jest.fn().mockImplementation(getMockDataForGetRepositories),
+      paginate: {
+        iterator: jest
+          .fn()
+          .mockImplementation(getMockIteratorForGetRepositories),
+      },
     })),
   };
 });

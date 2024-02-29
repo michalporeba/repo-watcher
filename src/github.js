@@ -33,19 +33,19 @@ export const streamRepositoriesFromGitHubAccount = async function* (
 const getRepositoriesForAccount = async function* (type, name, octokit) {
   let getter = type === "org" ? getOrgRepositories : getUserRepositories;
   const repositories = await getter(name, octokit);
-  for (let repository of repositories) {
-    yield repository;
+  for await (const repository of repositories) {
+    yield* repository;
   }
 };
 
 const getOrgRepositories = async (org, octokit) =>
-  await octokit.paginate(
+  octokit.paginate.iterator(
     octokit.rest.repos.listForOrg,
     createRequestForOrgRepos(org),
   );
 
 const getUserRepositories = async (user, octokit) =>
-  await octokit.paginate(
+  octokit.paginate.iterator(
     octokit.rest.repos.listForUser,
     createRequestForUserRepos(user),
   );
