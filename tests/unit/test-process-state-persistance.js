@@ -24,8 +24,8 @@ jest.unstable_mockModule("@octokit/rest", () => {
 });
 
 const config = {
-  createCache: createMockCache,
-  createOctokit: createMockOctokit,
+  cache: createMockCache,
+  octokit: createMockOctokit,
 };
 
 describe("Test process state persistance", () => {

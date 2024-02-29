@@ -23,7 +23,7 @@ jest.unstable_mockModule("@octokit/rest", () => {
   };
 });
 
-const config = { createOctokit: createMockOctokit };
+const config = { octokit: createMockOctokit };
 
 describe("Test getting GitHub repos", () => {
   test("get all user repos", async () => {

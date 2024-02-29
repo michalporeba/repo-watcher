@@ -115,10 +115,10 @@ for await (let repository in streamRepositories(accounts)) {
 All public methods will accept a `config` object as their last, optional parameter to alter and extend their behaviour.
 The configuration supports the following options at the moment:
 
-| Property      | Type     | Description                                                                                                                                    |
-| ------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| createOctokit | function | A factory method creating instance of [Octokit](https://github.com/octokit/octokit.js). It can be used to customise GitHub API client creation |
-| cache         | object   | Configuration for the caching systems to persist information between function calls                                                            |
+| Property | Type                         | Description                                                                                                                                    |
+| -------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| octokit  | object or a factory function | A factory method creating instance of [Octokit](https://github.com/octokit/octokit.js). It can be used to customise GitHub API client creation |
+| cache    | object or a factory function | Configuration for the caching systems to persist information between function calls                                                            |
 
 ## cache
 

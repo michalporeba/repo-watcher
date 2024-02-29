@@ -82,4 +82,11 @@ describe("Test config default value resolution", () => {
       value: 42,
     });
   });
+
+  test("the config can be resolved multiple times without affecting the output", async () => {
+    const options = { cache: { type: "fs" } };
+    const first = await resolveDefaultsFor(options);
+    const second = await resolveDefaultsFor(first);
+    validateDefaultConfigObject(second);
+  });
 });

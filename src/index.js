@@ -1,7 +1,6 @@
 "use strict";
 
-import { createCache as createDefaultCache } from "./cache-utils";
-import { createOctokit as createDefaultOctokit } from "./github-utils";
+import { resolveDefaultsFor } from "./config";
 import { streamRepositoriesFromGitHubAccount } from "./github";
 
 export const getRepositories = async (accounts, config) => {
@@ -18,13 +17,7 @@ export const getRepositories = async (accounts, config) => {
 };
 
 export const streamRepositories = async function* (accounts, config = {}) {
-  const {
-    createOctokit = createDefaultOctokit,
-    createCache = createDefaultCache,
-  } = config;
-
-  const octokit = await createOctokit();
-  const cache = await createCache();
+  const { cache, octokit } = await resolveDefaultsFor(config);
 
   for (const account of accounts) {
     yield* streamRepositoriesFromGitHubAccount(account, octokit);
@@ -40,7 +33,6 @@ export const streamRepositories = async function* (accounts, config = {}) {
 };
 
 export const getState = async (config = {}) => {
-  const { createCache = createDefaultCache } = config;
-  const cache = await createCache();
+  const { cache } = await resolveDefaultsFor(config);
   return await cache.get("status");
 };
