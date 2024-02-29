@@ -7,3 +7,18 @@ The local cache is working, however
 
 - The state returned by `getRepositories` is hardcoded.
 - There is no way to pass a factory method to allow extensions and mocks.
+- should the config be:
+
+```json
+{
+  cache: {
+    create: function,
+    type: value,
+    path: value
+  },
+  octokit: {
+    create: function,
+    token: value
+  }
+}
+```
