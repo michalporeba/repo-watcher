@@ -18,30 +18,37 @@ const rateLimitsPlugin = (octokit, options) => {
   // hook into the request lifecycle
   octokit.hook.wrap("request", async (request, options) => {
     const response = await request(options);
-    octokit.rate = getReteInfoFromResponse(response);
+    octokit.rateInfo = getReteInfoFromResponse(response);
 
     return response;
   });
 
   const getReteInfoFromResponse = (response) => ({
+    limit: parseInt(response.headers["x-ratelimit-limit"]),
     remaining: parseInt(response.headers["x-ratelimit-remaining"]),
+    cooldown:
+      parseInt(response.headers["x-ratelimit-remaining"]) - Date.now() / 1000,
   });
 
   const getRateInfoByRequest = async (octokit) => {
+    // this call is not rate limited and will succeed even if rate limit is exhausted
+    // if there is an exception throw it is caused by something else
     const { data } = await octokit.rest.rateLimit.get();
     return {
+      limit: data.rate.limit,
       remaining: data.rate.remaining,
+      cooldown: data.rate.reset - Date.now() / 1000,
     };
   };
 
   // the below will be added to the octokit object as top level members
   return {
-    remainingRateLimit: null,
+    rateInfo: null,
     getRateInfo: async () => {
-      if (!octokit?.rate) {
-        octokit.rate = await getRateInfoByRequest(octokit);
+      if (!octokit?.rateInfo) {
+        octokit.rateInfo = await getRateInfoByRequest(octokit);
       }
-      return octokit.rate;
+      return octokit.rateInfo;
     },
   };
 };
