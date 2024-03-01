@@ -5,7 +5,7 @@ import { createMockCache } from "../data/test-cache-utils";
 
 import {
   createMockOctokit,
-  getMockIteratorForGetRepositories,
+  mockIteratorForGetRepositories,
 } from "../data/test-data-utils";
 import { jest } from "@jest/globals";
 import customJestExtensions from "../data/jest-extensions";
@@ -19,9 +19,7 @@ jest.unstable_mockModule("@octokit/rest", () => {
     Octokit: jest.fn().mockImplementation(() => ({
       ...new actual.Octokit(),
       paginate: {
-        iterator: jest
-          .fn()
-          .mockImplementation(getMockIteratorForGetRepositories),
+        iterator: mockIteratorForGetRepositories,
       },
     })),
   };

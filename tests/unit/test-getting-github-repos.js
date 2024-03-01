@@ -4,7 +4,7 @@ import { getRepositories } from "../../src/index";
 import {
   createMockOctokit,
   getExpectedDataFor,
-  getMockIteratorForGetRepositories,
+  mockIteratorForGetRepositories,
   repositoryComparator,
 } from "../data/test-data-utils";
 import { jest } from "@jest/globals";
@@ -19,9 +19,7 @@ jest.unstable_mockModule("@octokit/rest", () => {
     Octokit: jest.fn().mockImplementation(() => ({
       ...new actual.Octokit(),
       paginate: {
-        iterator: jest
-          .fn()
-          .mockImplementation(getMockIteratorForGetRepositories),
+        iterator: mockIteratorForGetRepositories,
       },
     })),
   };
@@ -65,6 +63,24 @@ describe("Test getting GitHub repos", () => {
       await getExpectedDataFor("orga", "repo-1"),
     ];
     const { data } = await getRepositories(accounts, config);
+    expect(data).toCloselyMatch(expectations, repositoryComparator);
+  });
+
+  test("Cached version is used if it is recent enough", async () => {
+    // plan:
+    // get repository from an API
+    // get it again ensuring API was not called.
+    // change time beyond cut off and try again. API should be used again
+
+    const apiCall = mockIteratorForGetRepositories;
+    // this is a single mock used by other tests as well, we need a baseline
+    const calls = apiCall.mock.calls.length;
+
+    const accounts = [{ name: "user1", type: "user", include: "repo-b" }];
+    const expectations = [await getExpectedDataFor("user1", "repo-b")];
+    const { data } = await getRepositories(accounts, config);
+
+    expect(mockIteratorForGetRepositories).toHaveBeenCalledTimes(calls + 1);
     expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
 });

@@ -1,6 +1,7 @@
 "use strict";
 
 import fs from "fs/promises";
+import { jest } from "@jest/globals";
 
 const objectFromFile = async (path) => {
   return JSON.parse(await fs.readFile(`./tests/data/${path}`, "utf8"));
@@ -28,12 +29,11 @@ export const getMockDataForGetRepositories = (_, parameters) => {
   throw "Incorrect API request";
 };
 
-export const getMockIteratorForGetRepositories = async function* (
-  _,
-  parameters,
-) {
-  yield getMockDataForGetRepositories(null, parameters);
-};
+export const mockIteratorForGetRepositories = jest
+  .fn()
+  .mockImplementation(async function* (_, parameters) {
+    yield getMockDataForGetRepositories(null, parameters);
+  });
 
 export const repositoryComparator = (expected, actual) => {
   return expected.account === actual.account && expected.name === actual.name;
