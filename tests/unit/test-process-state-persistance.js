@@ -33,13 +33,15 @@ const config = {
 };
 
 describe("Test process state persistance", () => {
-  test("All repositories are present", async () => {
+  test("All repositories are counted", async () => {
     const accounts = [
       { name: "user1", type: "user" },
       { name: "orga", type: "org" },
     ];
     const { state } = await getRepositories(accounts, config);
 
+    console.log(state);
+    console.log(await getState(config));
     expect(state).toMatchObject(await getState(config));
     expect(state).toMatchObject({
       repositories: {

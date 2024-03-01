@@ -6,4 +6,3 @@ _It is my way to apply the Hemingway Bridge method without commiting broken code
 The local cache is working, however
 
 - The state returned by `getRepositories` is hardcoded.
-- the rate limiting plugin won't return anything if there were no calls. It should make a call to rate limit endpoint in that situation.

@@ -18,18 +18,22 @@ export const getRepositories = async (accounts, config) => {
 
 export const streamRepositories = async function* (accounts, config = {}) {
   const { cache, octokit } = await resolveDefaultsFor(config);
+  let status = {
+    discovered: 0,
+    collected: 0,
+    remaining: 0,
+  };
 
   for (const account of accounts) {
-    yield* streamRepositoriesFromGitHubAccount(account, octokit);
+    const repositories = streamRepositoriesFromGitHubAccount(account, octokit);
+    for await (const repository of repositories) {
+      status.discovered += 1;
+      status.collected += 1;
+      yield repository;
+    }
   }
 
-  await cache.set("status", {
-    repositories: {
-      discovered: 3,
-      collected: 3,
-      remaining: 0,
-    },
-  });
+  await cache.set("status", { repositories: status });
 };
 
 export const getState = async (config = {}) => {
