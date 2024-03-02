@@ -32,15 +32,15 @@ export const streamRepositories = async function* (accounts, config = {}) {
       repositories: {},
     };
 
-    const cooldown =
-      accountSummary?.timestamp + config.cooldown > Date.now() / 1000;
+    const inNoRefreshTime =
+      accountSummary?.timestamp + config.noRefreshTime > Date.now() / 1000;
 
-    const repositories = cooldown
+    const repositories = inNoRefreshTime
       ? streamRepositoriesFromCache(accountSummary, cache)
       : streamRepositoriesFromGitHubAccount(account, octokit);
 
     for await (const r of repositories) {
-      if (cooldown) {
+      if (inNoRefreshTime) {
         yield r;
         continue;
       }

@@ -25,8 +25,11 @@ jest.unstable_mockModule("@octokit/rest", () => {
   };
 });
 
-const config = { octokit: createMockOctokit, cooldown: 0 };
-const configWithCooldown = { octokit: createMockOctokit, cooldown: 60 };
+const config = { octokit: createMockOctokit, noRefreshTime: 0 };
+const configWithNoRefreshTime = {
+  octokit: createMockOctokit,
+  noRefreshTime: 60,
+};
 
 describe("Test getting GitHub repos", () => {
   test("get all user repos", async () => {
@@ -85,12 +88,18 @@ describe("Test getting GitHub repos", () => {
     expect(apiCall).toHaveBeenCalledTimes(calls + 1);
     expect(data1).toCloselyMatch(expectations, repositoryComparator);
 
-    const { data: data2 } = await getRepositories(accounts, configWithCooldown);
+    const { data: data2 } = await getRepositories(
+      accounts,
+      configWithNoRefreshTime,
+    );
     expect(apiCall).toHaveBeenCalledTimes(calls + 1);
     //expect(data2).toCloselyMatch(expectations, repositoryComparator);
 
     jest.advanceTimersByTime(120_000);
-    const { data: data3 } = await getRepositories(accounts, configWithCooldown);
+    const { data: data3 } = await getRepositories(
+      accounts,
+      configWithNoRefreshTime,
+    );
     expect(apiCall).toHaveBeenCalledTimes(calls + 2);
   });
 });
