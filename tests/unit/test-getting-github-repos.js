@@ -73,6 +73,7 @@ describe("Test getting GitHub repos", () => {
     // get it again ensuring API was not called.
     // change time beyond cut off and try again. API should be used again
 
+    jest.useFakeTimers();
     const apiCall = mockIteratorForGetRepositories;
     // this is a single mock used by other tests as well, we need a baseline
     const calls = apiCall.mock.calls.length;
@@ -87,5 +88,9 @@ describe("Test getting GitHub repos", () => {
     const { data: data2 } = await getRepositories(accounts, configWithCooldown);
     expect(apiCall).toHaveBeenCalledTimes(calls + 1);
     //expect(data2).toCloselyMatch(expectations, repositoryComparator);
+
+    jest.advanceTimersByTime(120_000);
+    const { data: data3 } = await getRepositories(accounts, configWithCooldown);
+    expect(apiCall).toHaveBeenCalledTimes(calls + 2);
   });
 });
