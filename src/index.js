@@ -2,6 +2,7 @@
 
 import { resolveDefaultsFor } from "./config";
 import { streamRepositoriesFromGitHubAccount } from "./github";
+import { streamRepositoriesFromCache } from "./cache";
 
 export const getRepositories = async (accounts, config) => {
   const repositories = [];
@@ -25,12 +26,38 @@ export const streamRepositories = async function* (accounts, config = {}) {
   };
 
   for (const account of accounts) {
-    const repositories = streamRepositoriesFromGitHubAccount(account, octokit);
-    for await (const repository of repositories) {
+    const accountSummaryPath = `github/${account.name}.state`;
+    let accountSummary = (await cache.get(accountSummaryPath)) || {
+      timestamp: 0,
+      repositories: {},
+    };
+
+    const cooldown =
+      accountSummary?.timestamp + config.cooldown > Date.now() / 1000;
+
+    const repositories = cooldown
+      ? streamRepositoriesFromCache(accountSummary, cache)
+      : streamRepositoriesFromGitHubAccount(account, octokit);
+
+    for await (const r of repositories) {
+      if (cooldown) {
+        yield r;
+        continue;
+      }
+
+      const repoSummary = {
+        timestamp: Math.floor(Date.now() / 1000),
+        path: `github/${account.name}/${r.name}`,
+      };
+
+      accountSummary.repositories[r.name] = repoSummary;
       status.discovered += 1;
       status.collected += 1;
-      yield repository;
+      await cache.set(repoSummary.path, r);
+      yield r;
     }
+    accountSummary.timestamp = Math.floor(Date.now() / 1000);
+    await cache.set(accountSummaryPath, accountSummary);
   }
 
   await cache.set("status", { repositories: status });

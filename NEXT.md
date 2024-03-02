@@ -5,4 +5,5 @@ _It is my way to apply the Hemingway Bridge method without commiting broken code
 
 The local cache is working, however
 
-- The state returned by `getRepositories` is hardcoded.
+- Cooldown is not the right configuration option
+- consider terms used in the process

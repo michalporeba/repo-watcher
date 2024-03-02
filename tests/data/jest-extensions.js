@@ -32,7 +32,7 @@ export default {
     };
   },
 
-  toCloselyMatch: (received, expected, comparator) => {
+  toCloselyMatch: (received = [], expected, comparator) => {
     let pass = true;
     let errorMessage = "";
     let matched = [];

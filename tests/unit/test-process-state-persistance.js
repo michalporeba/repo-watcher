@@ -38,8 +38,6 @@ describe("Test process state persistance", () => {
     ];
     const { state } = await getRepositories(accounts, config);
 
-    console.log(state);
-    console.log(await getState(config));
     expect(state).toMatchObject(await getState(config));
     expect(state).toMatchObject({
       repositories: {

@@ -17,6 +17,7 @@ export const resolveDefaultsFor = async (config) => {
     : {
         cache: await resolveConfig(config?.cache, createDefaultCache),
         octokit: await resolveConfig(config?.octokit, createDefaultOctokit),
+        cooldown: config?.cooldown || 3600,
         resolved: true,
       };
 };
