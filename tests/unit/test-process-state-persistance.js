@@ -1,7 +1,6 @@
 "use strict";
 
 import { getRepositories, getState } from "../../src/index";
-import { createMockCache } from "../data/test-cache-utils";
 
 import {
   createMockOctokit,
@@ -26,8 +25,9 @@ jest.unstable_mockModule("@octokit/rest", () => {
 });
 
 const config = {
-  cache: createMockCache,
+  cache: { type: "mem" },
   octokit: createMockOctokit,
+  noRefreshTime: 0,
 };
 
 describe("Test process state persistance", () => {
@@ -37,6 +37,8 @@ describe("Test process state persistance", () => {
       { name: "orga", type: "org" },
     ];
     const { state } = await getRepositories(accounts, config);
+
+    console.log(state);
 
     expect(state).toMatchObject(await getState(config));
     expect(state).toMatchObject({

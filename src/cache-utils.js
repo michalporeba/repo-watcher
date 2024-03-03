@@ -2,6 +2,7 @@
 
 import { mkdir, readFile, unlink, writeFile } from "fs/promises";
 import pathtools from "path";
+import { RepoCache } from "./cache";
 
 export const createCache = async (config = {}) => {
   const { type = "fs" } = config;
@@ -11,13 +12,15 @@ export const createCache = async (config = {}) => {
       return Promise.resolve(new FileSystemRepoCache(config));
     case "noop":
       return Promise.resolve(new NoopRepoCache());
+    case "mem":
+      return Promise.resolve(globalInMemoryCache);
     default:
       return Promise.reject(new Error(`Unknown cache type: ${type}!`));
   }
 };
 
 // istanbul ignore next - it's just a no-operation implementation
-export class NoopRepoCache {
+export class NoopRepoCache extends RepoCache {
   async set(key, value) {}
   async get(key) {
     return null;
@@ -26,10 +29,31 @@ export class NoopRepoCache {
   async remove(key) {}
 }
 
-export class FileSystemRepoCache {
+export class InMemoryRepoCache extends RepoCache {
+  cache = {};
+
+  constructor() {
+    super();
+  }
+
+  clear() {
+    this.cache = {};
+  }
+  async set(key, value) {
+    this.cache[key] = value;
+  }
+  async get(key) {
+    return Promise.resolve(this.cache[key]);
+  }
+}
+
+const globalInMemoryCache = new InMemoryRepoCache();
+
+export class FileSystemRepoCache extends RepoCache {
   #cacheRootPath;
 
   constructor(config) {
+    super();
     this.#cacheRootPath = config?.path ?? "cache";
   }
 

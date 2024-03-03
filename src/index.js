@@ -2,9 +2,9 @@
 
 import { resolveDefaultsFor } from "./config";
 import { streamRepositoriesFromGitHubAccount } from "./github";
-import { streamRepositoriesFromCache } from "./cache";
 
 export const getRepositories = async (accounts, config) => {
+  const { cache } = await resolveDefaultsFor(config);
   const repositories = [];
 
   for await (const repository of streamRepositories(accounts, config)) {
@@ -13,7 +13,7 @@ export const getRepositories = async (accounts, config) => {
 
   return {
     data: repositories,
-    state: await getState(config),
+    state: await cache.getProcessState(),
   };
 };
 
@@ -36,7 +36,7 @@ export const streamRepositories = async function* (accounts, config = {}) {
       accountSummary?.timestamp + config.noRefreshTime > Date.now() / 1000;
 
     const repositories = inNoRefreshTime
-      ? streamRepositoriesFromCache(accountSummary, cache)
+      ? cache.streamRepositoriesFromCache(accountSummary)
       : streamRepositoriesFromGitHubAccount(account, octokit);
 
     for await (const r of repositories) {
@@ -60,10 +60,10 @@ export const streamRepositories = async function* (accounts, config = {}) {
     await cache.set(accountSummaryPath, accountSummary);
   }
 
-  await cache.set("status", { repositories: status });
+  await cache.setProcessState({ repositories: status });
 };
 
-export const getState = async (config = {}) => {
+export const getState = async (config) => {
   const { cache } = await resolveDefaultsFor(config);
-  return await cache.get("status");
+  return await cache.getProcessState();
 };
