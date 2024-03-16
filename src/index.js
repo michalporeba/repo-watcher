@@ -23,9 +23,7 @@ export const streamRepositories = async function* (accounts, config = {}) {
   let status = createDefaultRunStatus();
 
   for (const account of accounts) {
-    const accountState = new AccountState("github", account.name);
-    await accountState.loadFrom(cache);
-
+    const accountState = await getAccountState("github", account.name, cache);
     const inNoRefreshTime = accountState.isInNoRefreshPeriod(
       config.noRefreshTime,
     );
@@ -51,6 +49,13 @@ export const streamRepositories = async function* (accounts, config = {}) {
   }
 
   await cache.setProcessState({ repositories: status });
+};
+
+const getAccountState = async (service, account, cache) => {
+  const state = new AccountState(service, account);
+  await state.loadFrom(cache);
+  console.log(state);
+  return state;
 };
 
 export const getState = async (config) => {
