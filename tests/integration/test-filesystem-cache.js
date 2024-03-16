@@ -1,6 +1,6 @@
 "use strict";
 
-import { createCache } from "../../src/cache-utils";
+import { createCache } from "../../src/cache/utils";
 
 describe("Test file system cache", () => {
   test("Ensure full value lifecycle is supported", async () => {

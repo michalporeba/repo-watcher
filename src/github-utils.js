@@ -14,7 +14,7 @@ export const createOctokit = async () => {
   });
 };
 
-const rateLimitsPlugin = (octokit, options) => {
+const rateLimitsPlugin = (octokit, _options) => {
   // hook into the request lifecycle
   octokit.hook.wrap("request", async (request, options) => {
     const response = await request(options);

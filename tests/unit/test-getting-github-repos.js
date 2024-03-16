@@ -93,6 +93,7 @@ describe("Test getting GitHub repos", () => {
       configWithNoRefreshTime,
     );
     expect(apiCall).toHaveBeenCalledTimes(calls + 1);
+    // TODO: this should work
     //expect(data2).toCloselyMatch(expectations, repositoryComparator);
 
     jest.advanceTimersByTime(120_000);
