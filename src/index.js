@@ -19,24 +19,18 @@ export const getRepositories = async (accounts, config) => {
 
 export const streamRepositories = async function* (accounts, config = {}) {
   const { cache, octokit } = await resolveDefaultsFor(config);
-  let status = {
-    discovered: 0,
-    collected: 0,
-    remaining: 0,
-  };
+  let status = createDefaultRunStatus();
 
   for (const account of accounts) {
     const accountSummaryPath = `github/${account.name}.state`;
-    let accountSummary = (await cache.get(accountSummaryPath)) || {
-      timestamp: 0,
-      repositories: {},
-    };
+    let accountState =
+      (await cache.get(accountSummaryPath)) || createAccountState();
 
     const inNoRefreshTime =
-      accountSummary?.timestamp + config.noRefreshTime > Date.now() / 1000;
+      accountState?.timestamp + config.noRefreshTime > Date.now() / 1000;
 
     const repositories = inNoRefreshTime
-      ? cache.streamRepositoriesFromCache(accountSummary)
+      ? cache.streamRepositoriesFromCache(accountState)
       : streamRepositoriesFromGitHubAccount(account, octokit);
 
     for await (const r of repositories) {
@@ -50,14 +44,14 @@ export const streamRepositories = async function* (accounts, config = {}) {
         path: `github/${account.name}/${r.name}`,
       };
 
-      accountSummary.repositories[r.name] = repoSummary;
+      accountState.repositories[r.name] = repoSummary;
       status.discovered += 1;
       status.collected += 1;
       await cache.set(repoSummary.path, r);
       yield r;
     }
-    accountSummary.timestamp = Math.floor(Date.now() / 1000);
-    await cache.set(accountSummaryPath, accountSummary);
+    accountState.timestamp = Math.floor(Date.now() / 1000);
+    await cache.set(accountSummaryPath, accountState);
   }
 
   await cache.setProcessState({ repositories: status });
@@ -67,3 +61,14 @@ export const getState = async (config) => {
   const { cache } = await resolveDefaultsFor(config);
   return await cache.getProcessState();
 };
+
+const createDefaultRunStatus = () => ({
+  discovered: 0,
+  collected: 0,
+  remaining: 0,
+});
+
+const createAccountState = () => ({
+  timestamp: 0,
+  repositories: {},
+});
