@@ -25,8 +25,9 @@ export const streamRepositories = async function* (accounts, config = {}) {
     const accountSummaryPath = `github/${account.name}.state`;
     let accountState = await cache.getAccount("github", account.name);
 
-    const inNoRefreshTime =
-      accountState?.timestamp + config.noRefreshTime > Date.now() / 1000;
+    const inNoRefreshTime = accountState.isInNoRefreshPeriod(
+      config.noRefreshTime,
+    );
 
     const repositories = inNoRefreshTime
       ? cache.streamRepositoriesFromCache(accountState)
@@ -50,7 +51,7 @@ export const streamRepositories = async function* (accounts, config = {}) {
       yield r;
     }
     accountState.timestamp = Math.floor(Date.now() / 1000);
-    await cache.set(accountSummaryPath, accountState);
+    await cache.setAccount(accountState);
   }
 
   await cache.setProcessState({ repositories: status });

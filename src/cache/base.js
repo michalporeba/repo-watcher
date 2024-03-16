@@ -40,10 +40,11 @@ export class CacheBase {
   }
 
   async getAccount(service, account) {
-    return (
-      (await this.get(this.#accountPath(service, account))) ||
-      this.#createAccount(service, account)
-    );
+    const data = await this.get(this.#accountPath(service, account));
+    if (data) {
+      return Account.rehydrate(data);
+    }
+    return new Account(this.#accountPath(service, account));
   }
 
   async setAccount(account) {
@@ -53,10 +54,22 @@ export class CacheBase {
   #accountPath(service, account) {
     return `${service}/${account}.state`;
   }
+}
 
-  #createAccount = (service, account) => ({
-    path: this.#accountPath(service, account),
-    timestamp: 0,
-    repositories: {},
-  });
+class Account {
+  constructor(path = "") {
+    this.path = path;
+    this.timestamp = 0;
+    this.repositories = {};
+  }
+
+  static rehydrate(data) {
+    let account = new Account();
+    Object.assign(account, data);
+    return account;
+  }
+
+  isInNoRefreshPeriod(noRefreshSeconds) {
+    return this.timestamp + noRefreshSeconds > Date.now() / 1000;
+  }
 }
