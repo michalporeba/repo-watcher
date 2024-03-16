@@ -1,5 +1,7 @@
 "use strict";
 
+import { AccountState } from "./account-state";
+
 export class CacheBase {
   async set(_key, _value) {
     return Promise.reject(
@@ -42,9 +44,9 @@ export class CacheBase {
   async getAccount(service, account) {
     const data = await this.get(this.#accountPath(service, account));
     if (data) {
-      return Account.rehydrate(data);
+      return AccountState.rehydrate(data);
     }
-    return new Account(this.#accountPath(service, account));
+    return new AccountState(this.#accountPath(service, account));
   }
 
   async setAccount(account) {
@@ -53,23 +55,5 @@ export class CacheBase {
 
   #accountPath(service, account) {
     return `${service}/${account}.state`;
-  }
-}
-
-class Account {
-  constructor(path = "") {
-    this.path = path;
-    this.timestamp = 0;
-    this.repositories = {};
-  }
-
-  static rehydrate(data) {
-    let account = new Account();
-    Object.assign(account, data);
-    return account;
-  }
-
-  isInNoRefreshPeriod(noRefreshSeconds) {
-    return this.timestamp + noRefreshSeconds > Date.now() / 1000;
   }
 }
