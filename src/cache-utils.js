@@ -2,16 +2,16 @@
 
 import { mkdir, readFile, unlink, writeFile } from "fs/promises";
 import pathtools from "path";
-import { RepoCache } from "./cache";
+import { CacheBase } from "./cache-base";
 
 export const createCache = async (config = {}) => {
   const { type = "fs" } = config;
 
   switch (type) {
     case "fs":
-      return Promise.resolve(new FileSystemRepoCache(config));
+      return Promise.resolve(new FileSystemCache(config));
     case "noop":
-      return Promise.resolve(new NoopRepoCache());
+      return Promise.resolve(new NoopCache());
     case "mem":
       return Promise.resolve(globalInMemoryCache);
     default:
@@ -20,7 +20,7 @@ export const createCache = async (config = {}) => {
 };
 
 // istanbul ignore next - it's just a no-operation implementation
-export class NoopRepoCache extends RepoCache {
+export class NoopCache extends CacheBase {
   async set(key, value) {}
   async get(key) {
     return null;
@@ -29,7 +29,7 @@ export class NoopRepoCache extends RepoCache {
   async remove(key) {}
 }
 
-export class InMemoryRepoCache extends RepoCache {
+export class InMemoryCache extends CacheBase {
   cache = {};
 
   constructor() {
@@ -47,9 +47,9 @@ export class InMemoryRepoCache extends RepoCache {
   }
 }
 
-const globalInMemoryCache = new InMemoryRepoCache();
+const globalInMemoryCache = new InMemoryCache();
 
-export class FileSystemRepoCache extends RepoCache {
+export class FileSystemCache extends CacheBase {
   #cacheRootPath;
 
   constructor(config) {

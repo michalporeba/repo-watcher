@@ -1,6 +1,6 @@
 "use strict";
 
-export class RepoCache {
+export class CacheBase {
   async set(key, value) {
     return Promise.reject(
       new Error("set is not implemented! Use a specialised class instance."),

@@ -1,23 +1,19 @@
-import {
-  FileSystemRepoCache,
-  NoopRepoCache,
-  createCache,
-} from "../../src/cache-utils";
+import { FileSystemCache, NoopCache, createCache } from "../../src/cache-utils";
 
 describe("Ensure behaviour of the default cache utils", () => {
   test("By default a file system cache is created", async () => {
     const sut = await createCache();
-    expect(sut).toBeInstanceOf(FileSystemRepoCache);
+    expect(sut).toBeInstanceOf(FileSystemCache);
   });
 
   test("The fs type returns a file system cache", async () => {
     const sut = await createCache({ type: "fs" });
-    expect(sut).toBeInstanceOf(FileSystemRepoCache);
+    expect(sut).toBeInstanceOf(FileSystemCache);
   });
 
   test("The noop type returns a no-op cache", async () => {
     const sut = await createCache({ type: "noop" });
-    expect(sut).toBeInstanceOf(NoopRepoCache);
+    expect(sut).toBeInstanceOf(NoopCache);
   });
 
   test("The unexpected type results in an exception", async () => {

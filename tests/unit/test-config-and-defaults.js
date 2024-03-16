@@ -2,11 +2,11 @@
 
 import { resolveDefaultsFor } from "../../src/config";
 import { Octokit } from "@octokit/rest";
-import { FileSystemRepoCache, NoopRepoCache } from "../../src/cache-utils";
+import { FileSystemCache, NoopCache } from "../../src/cache-utils";
 
 const validateDefaultConfigObject = (sut) => {
   const expected = {
-    cache: expect.any(FileSystemRepoCache),
+    cache: expect.any(FileSystemCache),
     octokit: expect.any(Octokit),
   };
 
@@ -22,7 +22,7 @@ describe("Test config default value resolution", () => {
 
   test("cache value is created based on the config", async () => {
     const sut = await resolveDefaultsFor({ cache: { type: "noop" } });
-    expect(sut.cache).toBeInstanceOf(NoopRepoCache);
+    expect(sut.cache).toBeInstanceOf(NoopCache);
   });
 
   test("cache value can be a factory method resolving to a constructed object", async () => {
