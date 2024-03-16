@@ -46,10 +46,11 @@ export class CacheBase {
     if (data) {
       return AccountState.rehydrate(data);
     }
-    return new AccountState(this.#accountPath(service, account));
+    return new AccountState(account, this.#accountPath(service, account));
   }
 
   async setAccount(account) {
+    account.timestamp = Math.floor(Date.now() / 1000);
     await this.set(account.path, account);
   }
 

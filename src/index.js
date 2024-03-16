@@ -22,7 +22,6 @@ export const streamRepositories = async function* (accounts, config = {}) {
   let status = createDefaultRunStatus();
 
   for (const account of accounts) {
-    const accountSummaryPath = `github/${account.name}.state`;
     let accountState = await cache.getAccount("github", account.name);
 
     const inNoRefreshTime = accountState.isInNoRefreshPeriod(
@@ -39,18 +38,13 @@ export const streamRepositories = async function* (accounts, config = {}) {
         continue;
       }
 
-      const repoSummary = {
-        timestamp: Math.floor(Date.now() / 1000),
-        path: `github/${account.name}/${r.name}`,
-      };
-
-      accountState.repositories[r.name] = repoSummary;
+      const repoPath = accountState.addRepo(r.name);
       status.discovered += 1;
       status.collected += 1;
-      await cache.set(repoSummary.path, r);
+      await cache.set(repoPath, r);
       yield r;
     }
-    accountState.timestamp = Math.floor(Date.now() / 1000);
+
     await cache.setAccount(accountState);
   }
 
