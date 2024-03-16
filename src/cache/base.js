@@ -40,21 +40,4 @@ export class CacheBase {
   async setProcessState(value) {
     await this.set("process.state", value);
   }
-
-  async getAccount(service, account) {
-    const data = await this.get(this.#accountPath(service, account));
-    if (data) {
-      return AccountState.rehydrate(data);
-    }
-    return new AccountState(account, this.#accountPath(service, account));
-  }
-
-  async setAccount(account) {
-    account.timestamp = Math.floor(Date.now() / 1000);
-    await this.set(account.path, account);
-  }
-
-  #accountPath(service, account) {
-    return `${service}/${account}.state`;
-  }
 }

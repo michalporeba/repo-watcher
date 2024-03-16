@@ -1,17 +1,11 @@
 "use strict";
 
 export class AccountState {
-  constructor(account = "", path = "") {
+  constructor(service, account) {
     this.account = account;
-    this.path = path;
+    this.path = AccountState.#accountPath(service, account);
     this.timestamp = 0;
     this.repositories = {};
-  }
-
-  static rehydrate(data) {
-    let account = new AccountState();
-    Object.assign(account, data);
-    return account;
   }
 
   isInNoRefreshPeriod(noRefreshSeconds) {
@@ -26,5 +20,21 @@ export class AccountState {
     };
 
     return path;
+  }
+
+  async saveTo(cache) {
+    this.timestamp = Math.floor(Date.now() / 1000);
+    await cache.set(this.path, this);
+  }
+
+  async loadFrom(cache) {
+    const data = await cache.get(this.path);
+    if (data) {
+      Object.assign(this, data);
+    }
+  }
+
+  static #accountPath(service, account) {
+    return `${service}/${account}.state`;
   }
 }

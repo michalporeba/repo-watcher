@@ -2,6 +2,7 @@
 
 import { resolveDefaultsFor } from "./config";
 import { streamRepositoriesFromGitHubAccount } from "./github";
+import { AccountState } from "./cache/account-state";
 
 export const getRepositories = async (accounts, config) => {
   const { cache } = await resolveDefaultsFor(config);
@@ -22,7 +23,8 @@ export const streamRepositories = async function* (accounts, config = {}) {
   let status = createDefaultRunStatus();
 
   for (const account of accounts) {
-    let accountState = await cache.getAccount("github", account.name);
+    const accountState = new AccountState("github", account.name);
+    await accountState.loadFrom(cache);
 
     const inNoRefreshTime = accountState.isInNoRefreshPeriod(
       config.noRefreshTime,
@@ -45,7 +47,7 @@ export const streamRepositories = async function* (accounts, config = {}) {
       yield r;
     }
 
-    await cache.setAccount(accountState);
+    await accountState.saveTo(cache);
   }
 
   await cache.setProcessState({ repositories: status });
