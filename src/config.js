@@ -1,5 +1,5 @@
 import { createOctokit as createDefaultOctokit } from "./github-utils";
-import { createCache as createDefaultCache } from "./cache-utils";
+import { createCache as createDefaultCache } from "./cache/utils";
 
 const resolveConfig = async (config, factory) => {
   if (typeof config === "function") {

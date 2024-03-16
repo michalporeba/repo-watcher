@@ -1,4 +1,6 @@
-import { FileSystemCache, NoopCache, createCache } from "../../src/cache-utils";
+import { createCache } from "../../src/cache/utils";
+import { FileSystemCache } from "../../src/cache/file-system";
+import { NoopCache } from "../../src/cache/no-op";
 
 describe("Ensure behaviour of the default cache utils", () => {
   test("By default a file system cache is created", async () => {

@@ -2,7 +2,8 @@
 
 import { resolveDefaultsFor } from "../../src/config";
 import { Octokit } from "@octokit/rest";
-import { FileSystemCache, NoopCache } from "../../src/cache-utils";
+import { FileSystemCache } from "../../src/cache/file-system";
+import { NoopCache } from "../../src/cache/no-op";
 
 const validateDefaultConfigObject = (sut) => {
   const expected = {
