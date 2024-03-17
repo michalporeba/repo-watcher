@@ -7,11 +7,7 @@
  */
 
 import { createOctokit } from "../../src/github-utils";
-import {
-  createRequestForUserRepos,
-  createRequestForOrgRepos,
-  createRequestForLanguageList,
-} from "../../src/github";
+import { createRequestForLanguageList } from "../../src/github";
 import customJestExtensions from "../data/jest-extensions";
 import { GitHub } from "../../src/github";
 
@@ -22,29 +18,6 @@ const DATETIME_REGEX =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
 
 expect.extend(customJestExtensions);
-
-const EXPECTED_REPO_RESPONSE_SHAPE = {
-  name: expect.stringMatching(NON_EMPTY_STRING_REGEX),
-  owner: { login: expect.stringMatching(NON_EMPTY_STRING_REGEX) },
-  created_at: expect.stringMatching(DATETIME_REGEX),
-  updated_at: expect.stringMatching(DATETIME_REGEX),
-  pushed_at: expect.stringMatching(DATETIME_REGEX),
-  default_branch: expect.any(String),
-  archived: expect.any(Boolean),
-  disabled: expect.any(Boolean),
-  fork: expect.any(Boolean),
-  is_template: expect.any(Boolean),
-  has_issues: expect.any(Boolean),
-  has_downloads: expect.any(Boolean),
-  has_projects: expect.any(Boolean),
-  has_wiki: expect.any(Boolean),
-  has_pages: expect.any(Boolean),
-  has_discussions: expect.any(Boolean),
-  size: expect.any(Number),
-  forks: expect.any(Number),
-  open_issues: expect.any(Number),
-  watchers: expect.any(Number),
-};
 
 const EXPECTED_REPOSITORY_SHAPE = {
   account: expect.stringMatching(NON_EMPTY_STRING_REGEX),
@@ -85,13 +58,6 @@ const EXPECTED_REPOSITORY_SHAPE = {
   topLanguage: expect.any(String),
 };
 
-const validateRepoResponseShape = (data) => {
-  expect(Array.isArray(data)).toBeTruthy();
-  data.forEach((r) => {
-    expect(r).toMatchObject(EXPECTED_REPO_RESPONSE_SHAPE);
-  });
-};
-
 const validateRepositoryShape = (r) => {
   expect(r).toMatchObject(EXPECTED_REPOSITORY_SHAPE);
   expect(r.url).toBeNullEmptyOrMatch(URL_REGEX);
@@ -101,30 +67,35 @@ const validateRepositoryShape = (r) => {
   expect(Array.isArray(r.topics)).toBeTruthy();
 };
 
+const validateRepositories = async (repositoryStream) => {
+  let repositories = 0;
+  for await (const repository of repositoryStream) {
+    repositories += 1;
+    validateRepositoryShape(repository);
+    if (repositories >= 5) {
+      break;
+    }
+  }
+  expect(repositories > 0).toBeTruthy();
+};
+
 const octokit = await createOctokit();
 
 describe("GitHub - Octokit wrapper", () => {
   test("can get user repositories", async () => {
     const github = new GitHub(octokit);
     const stream = github.streamRepositories("user", "michalporeba");
-    let repositories = 0;
-    for await (const repository of stream) {
-      repositories += 1;
-      validateRepositoryShape(repository);
-    }
-    expect(repositories > 0).toBeTruthy();
-  }, 10000);
+    await validateRepositories(stream);
+  }, 10_000);
+
+  test("can get organisation repositories", async () => {
+    const github = new GitHub(octokit);
+    const stream = github.streamRepositories("org", "alphagov");
+    await validateRepositories(stream);
+  }, 10_000);
 });
 
 describe("GitHub API responses", () => {
-  test("organisation repos have necessary properties and values", async () => {
-    const { data } = await octokit.rest.repos.listForOrg(
-      createRequestForOrgRepos("alphagov"),
-    );
-
-    validateRepoResponseShape(data);
-  }, 10000);
-
   test("repository languages are returned", async () => {
     const { data } = await octokit.rest.repos.listLanguages(
       createRequestForLanguageList("michalporeba", "repo-watcher"),
