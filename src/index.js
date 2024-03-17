@@ -28,16 +28,10 @@ export const streamRepositories = async function* (accounts, config = {}) {
       config.noRefreshTime,
     );
 
-    let repositories = inNoRefreshTime
-      ? accountState.streamRepositoriesFrom(cache)
-      : streamRepositoriesFromGitHubAccount(octokit, account);
-
-    repositories = filterRepositories(repositories, account);
-
     if (inNoRefreshTime) {
-      yield* processLocally(repositories);
+      yield* processLocally(account, accountState, cache);
     } else {
-      yield* processRemotely(repositories, accountState, cache);
+      yield* processRemotely(account, accountState, cache, octokit);
       status.discovered += accountState.countRepositories();
       status.collected += accountState.countRepositories();
     }
@@ -56,12 +50,24 @@ const filterRepositories = async function* (repositories, { include }) {
   }
 };
 
-const processLocally = async function* (repositories) {
-  yield* repositories;
+const processLocally = async function* (accountConfig, accountState, cache) {
+  const repositories = accountState.streamRepositoriesFrom(cache);
+  yield* filterRepositories(repositories, accountConfig);
 };
 
-const processRemotely = async function* (repositories, accountState, cache) {
-  for await (const repository of repositories) {
+const processRemotely = async function* (
+  accountConfig,
+  accountState,
+  cache,
+  octokit,
+) {
+  const repositories = streamRepositoriesFromGitHubAccount(
+    octokit,
+    accountConfig,
+  );
+  const filteredRepositories = filterRepositories(repositories, accountConfig);
+
+  for await (const repository of filteredRepositories) {
     const repoPath = accountState.addRepo(repository.name);
     await cache.set(repoPath, repository);
 
