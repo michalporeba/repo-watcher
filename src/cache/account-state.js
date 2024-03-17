@@ -22,6 +22,10 @@ export class AccountState {
     return path;
   }
 
+  countRepositories() {
+    return Object.keys(this.repositories).length;
+  }
+
   async saveTo(cache) {
     this.timestamp = Math.floor(Date.now() / 1000);
     await cache.set(this.path, this);
