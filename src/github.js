@@ -22,9 +22,10 @@ export class GitHub {
   };
 
   getLanguages = async function (owner, repo) {
-    return await this.octokit.rest.repos.listLanguages(
+    const { data } = await this.octokit.rest.repos.listLanguages(
       createRequestForLanguageList(owner, repo),
     );
+    return data;
   };
 
   #getRepositoriesForAccount = async function* (type, name, octokit) {
