@@ -2,6 +2,49 @@
 
 import { GITHUB_HEADERS, GITHUB_PAGESIZE } from "./github-utils";
 
+export class GitHub {
+  constructor(octokit, config = {}) {
+    this.octokit = octokit;
+    this.pagesize = config?.pagesize || GITHUB_PAGESIZE;
+  }
+
+  streamRepositories = async function* (type, name) {
+    const formatter = createRepositoryDataFormatterFor(name);
+    const repositories = this.#getRepositoriesForAccount(
+      type,
+      name,
+      this.octokit,
+    );
+
+    for await (const repository of repositories) {
+      yield formatter(repository);
+    }
+  };
+
+  #getRepositoriesForAccount = async function* (type, name, octokit) {
+    let getter =
+      type === "org" ? this.#getOrgRepositories : this.#getUserRepositories;
+    const repositories = await getter(name, octokit);
+    for await (const { data } of repositories) {
+      for (const repository of data) {
+        yield repository;
+      }
+    }
+  };
+
+  #getOrgRepositories = async (org, octokit) =>
+    octokit.paginate.iterator(
+      octokit.rest.repos.listForOrg,
+      createRequestForOrgRepos(org),
+    );
+
+  #getUserRepositories = async (user, octokit) =>
+    octokit.paginate.iterator(
+      octokit.rest.repos.listForUser,
+      createRequestForUserRepos(user),
+    );
+}
+
 export const createRequestForOrgRepos = (org) => ({
   org,
   type: "public",
@@ -34,20 +77,26 @@ export const streamRepositoriesFromGitHubAccount = async function* (
   }
 };
 
+// moved
 const getRepositoriesForAccount = async function* (type, name, octokit) {
   let getter = type === "org" ? getOrgRepositories : getUserRepositories;
   const repositories = await getter(name, octokit);
-  for await (const repository of repositories) {
-    yield* repository;
+  for await (const page of repositories) {
+    console.log(page);
+    for (const repository of page) {
+      yield repository;
+    }
   }
 };
 
+// moved
 const getOrgRepositories = async (org, octokit) =>
   octokit.paginate.iterator(
     octokit.rest.repos.listForOrg,
     createRequestForOrgRepos(org),
   );
 
+// moved
 const getUserRepositories = async (user, octokit) =>
   octokit.paginate.iterator(
     octokit.rest.repos.listForUser,

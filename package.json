@@ -7,6 +7,7 @@
   "scripts": {
     "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/unit/",
     "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/integration/",
+    "wip": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/integration/ensure-github-responses.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",

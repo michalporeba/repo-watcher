@@ -31,7 +31,7 @@ export const streamRepositories = async function* (accounts, config = {}) {
     if (inNoRefreshTime) {
       yield* processLocally(account, accountState, cache);
     } else {
-      yield* processRemotely(account, accountState, cache, octokit);
+      yield* processFromGitHub(account, accountState, cache, octokit);
       status.discovered += accountState.countRepositories();
       status.collected += accountState.countRepositories();
     }
@@ -55,7 +55,7 @@ const processLocally = async function* (accountConfig, accountState, cache) {
   yield* filterRepositories(repositories, accountConfig);
 };
 
-const processRemotely = async function* (
+const processFromGitHub = async function* (
   accountConfig,
   accountState,
   cache,

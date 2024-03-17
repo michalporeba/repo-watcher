@@ -13,6 +13,7 @@ import {
   createRequestForLanguageList,
 } from "../../src/github";
 import customJestExtensions from "../data/jest-extensions";
+import { GitHub } from "../../src/github";
 
 const NON_EMPTY_STRING_REGEX = /.+/;
 const URL_REGEX =
@@ -58,6 +59,18 @@ const validateRepoResponseShape = (data) => {
 };
 
 const octokit = await createOctokit();
+
+describe("GitHub - Octokit wrapper", () => {
+  test.only("can get user repositories", async () => {
+    const github = new GitHub(octokit);
+    const stream = github.streamRepositories("user", "michalporeba");
+    let repositories = 0;
+    for await (const repository of stream) {
+      repositories += 1;
+    }
+    expect(repositories > 0).toBeTruthy();
+  });
+});
 
 describe("GitHub API responses", () => {
   test("user repos have necessary properties and values", async () => {
