@@ -27,7 +27,7 @@ const octokit = await createOctokit();
 try {
   console.log(await octokit.getRateInfo());
   for (let i = 0; i < 1; i++) {
-    const data = await makeSomeApiCalls(octokit);
+    await makeSomeApiCalls(octokit);
   }
   console.log(await octokit.getRateInfo());
 } catch (err) {

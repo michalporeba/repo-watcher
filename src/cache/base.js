@@ -1,7 +1,5 @@
 "use strict";
 
-import { AccountState } from "./account-state";
-
 export class CacheBase {
   async set(_key, _value) {
     return Promise.reject(

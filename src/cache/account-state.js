@@ -26,9 +26,11 @@ export class AccountState {
     return Object.keys(this.repositories).length;
   }
 
-  streamRepositoriesFrom = async function* (cache) {
-    for (const r in this?.repositories) {
-      yield cache.get(this.repositories[r].path);
+  streamRepositoriesFrom = async function* (cache, { include }) {
+    for (const repository in this?.repositories) {
+      if (!include || include.includes(repository)) {
+        yield cache.get(this.repositories[repository].path);
+      }
     }
   };
 

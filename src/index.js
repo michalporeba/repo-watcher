@@ -29,8 +29,8 @@ export const streamRepositories = async function* (accounts, config = {}) {
     );
 
     const repositories = inNoRefreshTime
-      ? accountState.streamRepositoriesFrom(cache)
-      : streamRepositoriesFromGitHubAccount(account, octokit);
+      ? accountState.streamRepositoriesFrom(cache, account)
+      : streamRepositoriesFromGitHubAccount(octokit, account);
 
     if (inNoRefreshTime) {
       yield* processLocally(repositories);
@@ -59,15 +59,9 @@ const processRemotely = async function* (repositories, accountState, cache) {
   }
 };
 
-const processRepositories = async function* (repositories) {
-  for await (const r of repositories) {
-  }
-};
-
 const getAccountState = async (service, account, cache) => {
   const state = new AccountState(service, account);
   await state.loadFrom(cache);
-  console.log(state);
   return state;
 };
 
