@@ -7,7 +7,6 @@
  */
 
 import { createOctokit } from "../../src/github-utils";
-import { createRequestForLanguageList } from "../../src/github";
 import customJestExtensions from "../data/jest-extensions";
 import { GitHub } from "../../src/github";
 
@@ -80,27 +79,21 @@ const validateRepositories = async (repositoryStream) => {
 };
 
 const octokit = await createOctokit();
+const github = new GitHub(octokit);
 
 describe("GitHub - Octokit wrapper", () => {
   test("can get user repositories", async () => {
-    const github = new GitHub(octokit);
     const stream = github.streamRepositories("user", "michalporeba");
     await validateRepositories(stream);
   }, 10_000);
 
   test("can get organisation repositories", async () => {
-    const github = new GitHub(octokit);
     const stream = github.streamRepositories("org", "alphagov");
     await validateRepositories(stream);
   }, 10_000);
-});
 
-describe("GitHub API responses", () => {
-  test("repository languages are returned", async () => {
-    const { data } = await octokit.rest.repos.listLanguages(
-      createRequestForLanguageList("michalporeba", "repo-watcher"),
-    );
-
-    expect(data).toMatchObject({ JavaScript: expect.any(Number) });
-  }, 10000);
+  test("can get repo languages", async () => {
+    const languages = await github.getLanguages("michalporeba", "repo-watcher");
+    expect(languages).toMatchObject({ JavaScript: expect.any(Number) });
+  });
 });

@@ -21,9 +21,14 @@ export class GitHub {
     }
   };
 
+  getLanguages = async function (owner, repo) {
+    return await this.octokit.rest.repos.listLanguages(
+      createRequestForLanguageList(owner, repo),
+    );
+  };
+
   #getRepositoriesForAccount = async function* (type, name, octokit) {
-    let getter =
-      type === "org" ? this.#getOrgRepositories : this.#getUserRepositories;
+    let getter = type === "org" ? getOrgRepositories : getUserRepositories;
     const repositories = await getter(name, octokit);
     for await (const { data } of repositories) {
       for (const repository of data) {
@@ -31,35 +36,23 @@ export class GitHub {
       }
     }
   };
-
-  #getOrgRepositories = async (org, octokit) =>
-    octokit.paginate.iterator(
-      octokit.rest.repos.listForOrg,
-      createRequestForOrgRepos(org),
-    );
-
-  #getUserRepositories = async (user, octokit) =>
-    octokit.paginate.iterator(
-      octokit.rest.repos.listForUser,
-      createRequestForUserRepos(user),
-    );
 }
 
-export const createRequestForOrgRepos = (org) => ({
+const createRequestForOrgRepos = (org) => ({
   org,
   type: "public",
   per_page: GITHUB_PAGESIZE,
   headers: GITHUB_HEADERS,
 });
 
-export const createRequestForUserRepos = (username) => ({
+const createRequestForUserRepos = (username) => ({
   username,
   type: "owner",
   per_page: GITHUB_PAGESIZE,
   headers: GITHUB_HEADERS,
 });
 
-export const createRequestForLanguageList = (owner, repo) => ({
+const createRequestForLanguageList = (owner, repo) => ({
   owner,
   repo,
   headers: GITHUB_HEADERS,
@@ -77,7 +70,7 @@ export const streamRepositoriesFromGitHubAccount = async function* (
   }
 };
 
-// moved
+// moved but still used by tests
 const getRepositoriesForAccount = async function* (type, name, octokit) {
   let getter = type === "org" ? getOrgRepositories : getUserRepositories;
   const repositories = await getter(name, octokit);
