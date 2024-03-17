@@ -4,11 +4,13 @@ import { resolveDefaultsFor } from "../../src/config";
 import { Octokit } from "@octokit/rest";
 import { FileSystemCache } from "../../src/cache/file-system";
 import { NoopCache } from "../../src/cache/no-op";
+import { GitHub } from "../../src/github";
 
 const validateDefaultConfigObject = (sut) => {
   const expected = {
     cache: expect.any(FileSystemCache),
     octokit: expect.any(Octokit),
+    github: expect.any(GitHub),
   };
 
   expect(sut).toMatchObject(expected);

@@ -1,10 +1,16 @@
 "use strict";
 
 import { Octokit } from "@octokit/rest";
+import { GitHub } from "./github";
 
 export const GITHUB_PAGESIZE = 100;
 export const GITHUB_HEADERS = {
   "X-GitHub-Api-Version": "2022-11-28",
+};
+
+export const createGitHub = async (config = {}) => {
+  const octokit = await createOctokit();
+  return new GitHub(octokit, config);
 };
 
 export const createOctokit = async () => {

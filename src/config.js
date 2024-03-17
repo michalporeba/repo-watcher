@@ -1,4 +1,7 @@
-import { createOctokit as createDefaultOctokit } from "./github-utils";
+import {
+  createOctokit as createDefaultOctokit,
+  createGitHub as createDefaultGitHub,
+} from "./github-utils";
 import { createCache as createDefaultCache } from "./cache/utils";
 
 const resolveConfig = async (config, factory) => {
@@ -17,6 +20,7 @@ export const resolveDefaultsFor = async (config) => {
     : {
         cache: await resolveConfig(config?.cache, createDefaultCache),
         octokit: await resolveConfig(config?.octokit, createDefaultOctokit),
+        github: await resolveConfig(config?.github, createDefaultGitHub),
         noRefreshTime: config?.noRefreshTime || 3600,
         resolved: true,
       };

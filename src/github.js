@@ -76,7 +76,6 @@ const getRepositoriesForAccount = async function* (type, name, octokit) {
   let getter = type === "org" ? getOrgRepositories : getUserRepositories;
   const repositories = await getter(name, octokit);
   for await (const page of repositories) {
-    console.log(page);
     for (const repository of page) {
       yield repository;
     }
