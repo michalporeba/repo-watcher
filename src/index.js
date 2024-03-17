@@ -29,7 +29,7 @@ export const streamRepositories = async function* (accounts, config = {}) {
     );
 
     const repositories = inNoRefreshTime
-      ? cache.streamRepositoriesFromCache(accountState)
+      ? accountState.streamRepositoriesFrom(cache)
       : streamRepositoriesFromGitHubAccount(account, octokit);
 
     if (inNoRefreshTime) {

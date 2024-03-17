@@ -26,6 +26,12 @@ export class AccountState {
     return Object.keys(this.repositories).length;
   }
 
+  streamRepositoriesFrom = async function* (cache) {
+    for (const r in this?.repositories) {
+      yield cache.get(this.repositories[r].path);
+    }
+  };
+
   async saveTo(cache) {
     this.timestamp = Math.floor(Date.now() / 1000);
     await cache.set(this.path, this);

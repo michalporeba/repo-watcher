@@ -27,12 +27,6 @@ export class CacheBase {
     );
   }
 
-  streamRepositoriesFromCache = async function* (account) {
-    for (const r in account?.repositories) {
-      yield this.get(account.repositories[r].path);
-    }
-  };
-
   async getProcessState() {
     return await this.get("process.state");
   }
