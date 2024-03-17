@@ -24,15 +24,13 @@ export const createRequestForLanguageList = (owner, repo) => ({
 
 export const streamRepositoriesFromGitHubAccount = async function* (
   octokit,
-  { type, name, include },
+  { type, name },
 ) {
   const formatter = createRepositoryDataFormatterFor(name);
   const repositories = getRepositoriesForAccount(type, name, octokit);
 
   for await (const repository of repositories) {
-    if (!include || include.includes(repository.name)) {
-      yield formatter(repository);
-    }
+    yield formatter(repository);
   }
 };
 

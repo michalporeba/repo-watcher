@@ -28,9 +28,11 @@ export const streamRepositories = async function* (accounts, config = {}) {
       config.noRefreshTime,
     );
 
-    const repositories = inNoRefreshTime
-      ? accountState.streamRepositoriesFrom(cache, account)
+    let repositories = inNoRefreshTime
+      ? accountState.streamRepositoriesFrom(cache)
       : streamRepositoriesFromGitHubAccount(octokit, account);
+
+    repositories = filterRepositories(repositories, account);
 
     if (inNoRefreshTime) {
       yield* processLocally(repositories);
@@ -44,6 +46,14 @@ export const streamRepositories = async function* (accounts, config = {}) {
   }
 
   await cache.setProcessState({ repositories: status });
+};
+
+const filterRepositories = async function* (repositories, { include }) {
+  for await (const repository of repositories) {
+    if (!include || include.includes(repository.name)) {
+      yield repository;
+    }
+  }
 };
 
 const processLocally = async function* (repositories) {
