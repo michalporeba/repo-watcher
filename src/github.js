@@ -140,6 +140,6 @@ const createRepositoryDataFormatterFor = (account) => (repo) => ({
     hasProjects: repo.has_projects,
     hasWiki: repo.has_wiki,
   },
-  topLanguage: repo.language,
+  topLanguage: repo?.language || "(none)",
   topics: repo.topics,
 });

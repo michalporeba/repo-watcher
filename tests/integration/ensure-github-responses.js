@@ -46,41 +46,77 @@ const EXPECTED_REPO_RESPONSE_SHAPE = {
   watchers: expect.any(Number),
 };
 
+const EXPECTED_REPOSITORY_SHAPE = {
+  account: expect.stringMatching(NON_EMPTY_STRING_REGEX),
+  owner: expect.stringMatching(NON_EMPTY_STRING_REGEX),
+  name: expect.stringMatching(NON_EMPTY_STRING_REGEX),
+  homepage: expect.stringMatching(NON_EMPTY_STRING_REGEX),
+  default_branch: expect.stringMatching(NON_EMPTY_STRING_REGEX),
+  size: expect.any(Number),
+  times: {
+    created: expect.stringMatching(DATETIME_REGEX),
+    updated: expect.stringMatching(DATETIME_REGEX),
+    pushed: expect.stringMatching(DATETIME_REGEX),
+  },
+  blobs: {
+    description: expect.any(String),
+  },
+  counts: {
+    forks: expect.any(Number),
+    openIssues: expect.any(Number),
+    watchers: expect.any(Number),
+  },
+  license: {
+    name: expect.any(String),
+    spdxId: expect.any(String),
+  },
+  properties: {
+    isArchived: expect.any(Boolean),
+    isDisabled: expect.any(Boolean),
+    isFork: expect.any(Boolean),
+    isTemplate: expect.any(Boolean),
+    hasDiscussions: expect.any(Boolean),
+    hasDownloads: expect.any(Boolean),
+    hasIssues: expect.any(Boolean),
+    hasPages: expect.any(Boolean),
+    hasProjects: expect.any(Boolean),
+    hasWiki: expect.any(Boolean),
+  },
+  topLanguage: expect.any(String),
+};
+
 const validateRepoResponseShape = (data) => {
   expect(Array.isArray(data)).toBeTruthy();
   data.forEach((r) => {
     expect(r).toMatchObject(EXPECTED_REPO_RESPONSE_SHAPE);
-    expect(r.description).toBeNullOrString();
-    expect(r.language).toBeNullOrString();
-    expect(r.homepage).toBeNullEmptyOrMatch(URL_REGEX);
-    expect(r.license?.name).toBeUndefinedOrString(String);
-    expect(r.license?.spdx_id).toBeUndefinedOrString(String);
   });
+};
+
+const validateRepositoryShape = (r) => {
+  expect(r).toMatchObject(EXPECTED_REPOSITORY_SHAPE);
+  expect(r.url).toBeNullEmptyOrMatch(URL_REGEX);
+  expect(r.topLanguage).toBeNullOrString();
+  expect(r.license?.name).toBeUndefinedOrString(String);
+  expect(r.license?.spdx_id).toBeUndefinedOrString(String);
+  expect(Array.isArray(r.topics)).toBeTruthy();
 };
 
 const octokit = await createOctokit();
 
 describe("GitHub - Octokit wrapper", () => {
-  test.only("can get user repositories", async () => {
+  test("can get user repositories", async () => {
     const github = new GitHub(octokit);
     const stream = github.streamRepositories("user", "michalporeba");
     let repositories = 0;
     for await (const repository of stream) {
       repositories += 1;
+      validateRepositoryShape(repository);
     }
     expect(repositories > 0).toBeTruthy();
-  });
+  }, 10000);
 });
 
 describe("GitHub API responses", () => {
-  test("user repos have necessary properties and values", async () => {
-    const { data } = await octokit.rest.repos.listForUser(
-      createRequestForUserRepos("michalporeba"),
-    );
-
-    validateRepoResponseShape(data);
-  }, 10000);
-
   test("organisation repos have necessary properties and values", async () => {
     const { data } = await octokit.rest.repos.listForOrg(
       createRequestForOrgRepos("alphagov"),
