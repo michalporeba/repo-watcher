@@ -10,6 +10,7 @@ import { createOctokit } from "../../src/github-utils";
 import {
   createRequestForUserRepos,
   createRequestForOrgRepos,
+  createRequestForLanguageList,
 } from "../../src/github";
 import customJestExtensions from "../data/jest-extensions";
 
@@ -71,5 +72,15 @@ describe("GitHub API responses", () => {
     const { data } = await octokit.rest.repos.listForOrg(
       createRequestForOrgRepos("alphagov"),
     );
+
+    validateRepoResponseShape(data);
+  }, 10000);
+
+  test("repository languages are returned", async () => {
+    const { data } = await octokit.rest.repos.listLanguages(
+      createRequestForLanguageList("michalporeba", "repo-watcher"),
+    );
+
+    expect(data).toMatchObject({ JavaScript: expect.any(Number) });
   }, 10000);
 });

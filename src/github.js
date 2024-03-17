@@ -16,6 +16,12 @@ export const createRequestForUserRepos = (username) => ({
   headers: GITHUB_HEADERS,
 });
 
+export const createRequestForLanguageList = (owner, repo) => ({
+  owner,
+  repo,
+  headers: GITHUB_HEADERS,
+});
+
 export const streamRepositoriesFromGitHubAccount = async function* (
   { type, name, include },
   octokit,
