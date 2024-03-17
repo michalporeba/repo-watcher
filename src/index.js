@@ -40,7 +40,6 @@ export const streamRepositories = async function* (accounts, config = {}) {
       status.collected += accountState.countRepositories();
     }
 
-    console.log(accountState);
     await accountState.saveTo(cache);
   }
 
@@ -50,6 +49,7 @@ export const streamRepositories = async function* (accounts, config = {}) {
 const processLocally = async function* (repositories) {
   yield* repositories;
 };
+
 const processRemotely = async function* (repositories, accountState, cache) {
   for await (const repository of repositories) {
     const repoPath = accountState.addRepo(repository.name);
