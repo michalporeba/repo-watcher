@@ -1,7 +1,6 @@
 "use strict";
 
 import { resolveDefaultsFor } from "../../src/config";
-import { Octokit } from "@octokit/rest";
 import { FileSystemCache } from "../../src/cache/file-system";
 import { NoopCache } from "../../src/cache/no-op";
 import { GitHub } from "../../src/github";
@@ -9,7 +8,6 @@ import { GitHub } from "../../src/github";
 const validateDefaultConfigObject = (sut) => {
   const expected = {
     cache: expect.any(FileSystemCache),
-    octokit: expect.any(Octokit),
     github: expect.any(GitHub),
   };
 
@@ -57,31 +55,31 @@ describe("Test config default value resolution", () => {
     });
   });
 
-  test("octokit value can be a factory method resolving to a constructed object", async () => {
+  test("github value can be a factory method resolving to a constructed object", async () => {
     const factory = async () => ({
       value: "default",
     });
 
-    const sut = await resolveDefaultsFor({ octokit: factory });
-    expect(sut.octokit).toMatchObject({
+    const sut = await resolveDefaultsFor({ github: factory });
+    expect(sut.github).toMatchObject({
       value: "default",
     });
   });
 
-  test("octokit can have a factory method", async () => {
+  test("github can have a factory method", async () => {
     const factory = async (config) => ({
       value: config?.value || "default",
     });
 
-    const test1 = await resolveDefaultsFor({ octokit: { create: factory } });
-    expect(test1.octokit).toMatchObject({
+    const test1 = await resolveDefaultsFor({ github: { create: factory } });
+    expect(test1.github).toMatchObject({
       value: "default",
     });
 
     const test2 = await resolveDefaultsFor({
-      octokit: { create: factory, value: 42 },
+      github: { create: factory, value: 42 },
     });
-    expect(test2.octokit).toMatchObject({
+    expect(test2.github).toMatchObject({
       value: 42,
     });
   });
