@@ -1,7 +1,6 @@
 "use strict";
 
 import { resolveDefaultsFor } from "./config";
-import { streamRepositoriesFromGitHubAccount } from "./github";
 import { AccountState } from "./cache/account-state";
 
 export const getRepositories = async (accounts, config) => {
@@ -19,7 +18,7 @@ export const getRepositories = async (accounts, config) => {
 };
 
 export const streamRepositories = async function* (accounts, config = {}) {
-  const { cache, octokit } = await resolveDefaultsFor(config);
+  const { cache, github } = await resolveDefaultsFor(config);
   let status = createDefaultRunStatus();
 
   for (const account of accounts) {
@@ -31,7 +30,7 @@ export const streamRepositories = async function* (accounts, config = {}) {
     if (inNoRefreshTime) {
       yield* processLocally(account, accountState, cache);
     } else {
-      yield* processFromGitHub(account, accountState, cache, octokit);
+      yield* processFromGitHub(account, accountState, cache, github);
       status.discovered += accountState.countRepositories();
       status.collected += accountState.countRepositories();
     }
@@ -59,12 +58,9 @@ const processFromGitHub = async function* (
   accountConfig,
   accountState,
   cache,
-  octokit,
+  github,
 ) {
-  const repositories = streamRepositoriesFromGitHubAccount(
-    octokit,
-    accountConfig,
-  );
+  const repositories = github.streamRepositories(accountConfig);
   const filteredRepositories = filterRepositories(repositories, accountConfig);
 
   for await (const repository of filteredRepositories) {

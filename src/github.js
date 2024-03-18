@@ -8,7 +8,7 @@ export class GitHub {
     this.pagesize = config?.pagesize || GITHUB_PAGESIZE;
   }
 
-  streamRepositories = async function* (type, name) {
+  streamRepositories = async function* ({ type, name }) {
     const formatter = createRepositoryDataFormatterFor(name);
     const repositories = this.#getRepositoriesForAccount(
       type,

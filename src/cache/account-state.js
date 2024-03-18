@@ -9,7 +9,7 @@ export class AccountState {
   }
 
   isInNoRefreshPeriod(noRefreshSeconds) {
-    return this.timestamp + noRefreshSeconds > Date.now() / 1000;
+    return this.timestamp + noRefreshSeconds >= Date.now() / 1000;
   }
 
   addRepo(repoName) {

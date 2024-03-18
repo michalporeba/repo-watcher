@@ -1,32 +1,14 @@
 "use strict";
 
 import { getRepositories, getState } from "../../src/index";
-
-import {
-  createMockOctokit,
-  mockIteratorForGetRepositories,
-} from "../data/test-data-utils";
-import { jest } from "@jest/globals";
 import customJestExtensions from "../data/jest-extensions";
+import { createFakeGitHub } from "../doubles/github";
 
 expect.extend(customJestExtensions);
 
-jest.unstable_mockModule("@octokit/rest", () => {
-  const actual = jest.requireActual("@octokit/rest");
-  return {
-    ...actual,
-    Octokit: jest.fn().mockImplementation(() => ({
-      ...new actual.Octokit(),
-      paginate: {
-        iterator: mockIteratorForGetRepositories,
-      },
-    })),
-  };
-});
-
 const config = {
   cache: { type: "mem" },
-  octokit: createMockOctokit,
+  github: createFakeGitHub,
   noRefreshTime: 0,
 };
 

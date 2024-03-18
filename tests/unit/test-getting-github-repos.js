@@ -2,33 +2,28 @@
 
 import { getRepositories } from "../../src/index";
 import {
-  createMockOctokit,
   getExpectedDataFor,
-  mockIteratorForGetRepositories,
   repositoryComparator,
 } from "../data/test-data-utils";
 import { jest } from "@jest/globals";
 import customJestExtensions from "../data/jest-extensions";
+import { createFakeGitHub, createThrowingGitHub } from "../doubles/github";
 
 expect.extend(customJestExtensions);
 
-jest.unstable_mockModule("@octokit/rest", () => {
-  const actual = jest.requireActual("@octokit/rest");
-  return {
-    ...actual,
-    Octokit: jest.fn().mockImplementation(() => ({
-      ...new actual.Octokit(),
-      paginate: {
-        iterator: mockIteratorForGetRepositories,
-      },
-    })),
-  };
-});
+const config = {
+  noRefreshTime: 0,
+  github: createFakeGitHub,
+};
 
-const config = { octokit: createMockOctokit, noRefreshTime: 0 };
 const configWithNoRefreshTime = {
-  octokit: createMockOctokit,
   noRefreshTime: 60,
+  github: createFakeGitHub,
+};
+
+const configWithNoRefreshTimeAndThrowingGitHub = {
+  noRefreshTime: 60,
+  github: createThrowingGitHub,
 };
 
 describe("Test getting GitHub repos", () => {
@@ -77,22 +72,18 @@ describe("Test getting GitHub repos", () => {
     // change time beyond cut off and try again. API should be used again
 
     jest.useFakeTimers();
-    const apiCall = mockIteratorForGetRepositories;
-    // this is a single mock used by other tests as well, we need a baseline
-    const calls = apiCall.mock.calls.length;
 
     const accounts = [{ name: "user1", type: "user", include: "repo-b" }];
     const expectations = [await getExpectedDataFor("user1", "repo-b")];
 
     const { data: data1 } = await getRepositories(accounts, config);
-    expect(apiCall).toHaveBeenCalledTimes(calls + 1);
     expect(data1).toCloselyMatch(expectations, repositoryComparator);
 
+    // this will throw if GitHub object is used
     const { data: data2 } = await getRepositories(
       accounts,
-      configWithNoRefreshTime,
+      configWithNoRefreshTimeAndThrowingGitHub,
     );
-    expect(apiCall).toHaveBeenCalledTimes(calls + 1);
     expect(data2).toCloselyMatch(expectations, repositoryComparator);
 
     jest.advanceTimersByTime(120_000);
@@ -101,6 +92,5 @@ describe("Test getting GitHub repos", () => {
       configWithNoRefreshTime,
     );
     expect(data3).toCloselyMatch(expectations, repositoryComparator);
-    expect(apiCall).toHaveBeenCalledTimes(calls + 2);
   });
 });

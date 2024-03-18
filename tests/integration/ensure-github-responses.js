@@ -83,12 +83,14 @@ const github = new GitHub(octokit);
 
 describe("GitHub - Octokit wrapper", () => {
   test("can get user repositories", async () => {
-    const stream = github.streamRepositories("user", "michalporeba");
+    const account = { type: "user", name: "michalporeba" };
+    const stream = github.streamRepositories(account);
     await validateRepositories(stream);
   }, 10_000);
 
   test("can get organisation repositories", async () => {
-    const stream = github.streamRepositories("org", "alphagov");
+    const account = { type: "org", name: "alphagov" };
+    const stream = github.streamRepositories(account);
     await validateRepositories(stream);
   }, 10_000);
 

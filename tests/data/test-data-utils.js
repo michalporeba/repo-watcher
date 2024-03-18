@@ -1,7 +1,6 @@
 "use strict";
 
 import fs from "fs/promises";
-import { jest } from "@jest/globals";
 
 const objectFromFile = async (path) => {
   return JSON.parse(await fs.readFile(`./tests/data/${path}`, "utf8"));
@@ -15,31 +14,13 @@ export const getMockResponseForGetRepositories = async function (account) {
   return await objectFromFile(`get-repos-for-${account}-response.json`);
 };
 
-export const getMockDataForGetRepositories = (_, parameters) => {
-  let account = "";
-  if (parameters?.type === "owner") {
-    account = parameters.username;
+export const getRepositoriesFor = async function* (account) {
+  const configuration = await objectFromFile("repositories.json");
+  for (const repository of configuration[account]) {
+    yield await objectFromFile(`${account}-${repository}.json`);
   }
-  if (parameters?.type === "public") {
-    account = parameters.org;
-  }
-  if (account) {
-    return Promise.resolve(getMockResponseForGetRepositories(account));
-  }
-  throw "Incorrect API request";
 };
-
-export const mockIteratorForGetRepositories = jest
-  .fn()
-  .mockImplementation(async function* (_, parameters) {
-    yield getMockDataForGetRepositories(null, parameters);
-  });
 
 export const repositoryComparator = (expected, actual) => {
   return expected.account === actual.account && expected.name === actual.name;
-};
-
-export const createMockOctokit = async () => {
-  const { Octokit } = await import("@octokit/rest");
-  return new Octokit();
 };
