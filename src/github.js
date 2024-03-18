@@ -28,6 +28,10 @@ export class GitHub {
     return data;
   };
 
+  getRemainingLimit = async function () {
+    await this.octokit.getRateInfo().remaining;
+  };
+
   #getRepositoriesForAccount = async function* (type, name, octokit) {
     let getter = type === "org" ? getOrgRepositories : getUserRepositories;
     const repositories = await getter(name, octokit);

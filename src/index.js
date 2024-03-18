@@ -28,7 +28,7 @@ export const streamRepositories = async function* (accounts, config) {
       config.noRefreshSeconds,
     );
 
-    if (inNoRefreshTime) {
+    if (inNoRefreshTime || (await github.getRemainingLimit()) < 10) {
       yield* processLocally(account, accountState, cache);
     } else {
       yield* processFromGitHub(account, accountState, cache, github);
