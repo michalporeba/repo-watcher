@@ -34,9 +34,7 @@ describe("Test getting GitHub repos", () => {
       await getExpectedDataFor("user1", "repo-b"),
     ];
 
-    console.log(expectations);
     const { data } = await getRepositories(accounts, config);
-    console.log(data);
     expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
 
