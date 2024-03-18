@@ -29,7 +29,8 @@ export class GitHub {
   };
 
   getRemainingLimit = async function () {
-    await this.octokit.getRateInfo().remaining;
+    const info = await this.octokit.getRateInfo();
+    return info.remaining;
   };
 
   #getRepositoriesForAccount = async function* (type, name, octokit) {

@@ -75,7 +75,7 @@ describe("Test getting GitHub repos", () => {
     expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
 
-  test.only("No API calls are attempted if rate limit is low", async () => {
+  test("No API calls are attempted if rate limit is low", async () => {
     const accounts = [{ name: "not-cached-user", type: "user" }];
     const { data } = await getRepositories(accounts, configWithDepletedGitHub);
     expect(data).toEqual([]);

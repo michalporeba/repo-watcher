@@ -15,7 +15,7 @@ const config = {
 };
 
 describe("Test process state persistance", () => {
-  test.only("All repositories are counted", async () => {
+  test("All repositories are counted", async () => {
     const { cache } = await resolveDefaultsFor(config);
 
     const accounts = [

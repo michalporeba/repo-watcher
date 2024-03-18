@@ -98,4 +98,11 @@ describe("GitHub - Octokit wrapper", () => {
     const languages = await github.getLanguages("michalporeba", "repo-watcher");
     expect(languages).toMatchObject({ JavaScript: expect.any(Number) });
   });
+
+  test("getting rate limit works - they decrease with calls", async () => {
+    const first = await github.getRemainingLimit();
+    await github.getLanguages("michalporeba", "repo-watcher");
+    const second = await github.getRemainingLimit();
+    expect(second).toBeLessThan(first);
+  });
 });

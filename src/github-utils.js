@@ -43,7 +43,7 @@ const rateLimitsPlugin = (octokit, _options) => {
     return {
       limit: data.rate.limit,
       remaining: data.rate.remaining,
-      cooldown: data.rate.reset - Date.now() / 1000,
+      cooldown: Date.now() / 1000 - data.rate.reset,
     };
   };
 

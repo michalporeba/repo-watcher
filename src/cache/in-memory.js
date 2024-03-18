@@ -9,12 +9,10 @@ export class InMemoryCache extends CacheBase {
     super();
   }
 
-  clear() {
-    this.cache = {};
-  }
   async set(key, value) {
     this.cache[key] = value;
   }
+
   async get(key) {
     return Promise.resolve(this.cache[key]);
   }
