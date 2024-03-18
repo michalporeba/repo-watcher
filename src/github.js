@@ -59,37 +59,12 @@ const createRequestForLanguageList = (owner, repo) => ({
   headers: GITHUB_HEADERS,
 });
 
-export const streamRepositoriesFromGitHubAccount = async function* (
-  octokit,
-  { type, name },
-) {
-  const formatter = createRepositoryDataFormatterFor(name);
-  const repositories = getRepositoriesForAccount(type, name, octokit);
-
-  for await (const repository of repositories) {
-    yield formatter(repository);
-  }
-};
-
-// moved but still used by tests
-const getRepositoriesForAccount = async function* (type, name, octokit) {
-  let getter = type === "org" ? getOrgRepositories : getUserRepositories;
-  const repositories = await getter(name, octokit);
-  for await (const page of repositories) {
-    for (const repository of page) {
-      yield repository;
-    }
-  }
-};
-
-// moved
 const getOrgRepositories = async (org, octokit) =>
   octokit.paginate.iterator(
     octokit.rest.repos.listForOrg,
     createRequestForOrgRepos(org),
   );
 
-// moved
 const getUserRepositories = async (user, octokit) =>
   octokit.paginate.iterator(
     octokit.rest.repos.listForUser,
