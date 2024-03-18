@@ -18,7 +18,7 @@ export const getRepositories = async (accounts, config) => {
   };
 };
 
-export const streamRepositories = async function* (accounts, config = {}) {
+export const streamRepositories = async function* (accounts, config) {
   const { cache, github } = await resolveDefaultsFor(config);
   const state = new ProcessState();
 
@@ -64,11 +64,12 @@ const processFromGitHub = async function* (
   const repositories = github.streamRepositories(accountConfig);
   const filteredRepositories = filterRepositories(repositories, accountConfig);
 
-  for await (const repository of filteredRepositories) {
-    const repoPath = accountState.addRepo(repository.name);
-    await cache.set(repoPath, repository);
+  for await (const repo of filteredRepositories) {
+    repo.languages = await github.getLanguages(repo.account, repo.name);
+    const repoPath = accountState.addRepo(repo.name);
+    await cache.set(repoPath, repo);
 
-    yield repository;
+    yield repo;
   }
 };
 

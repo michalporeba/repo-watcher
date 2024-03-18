@@ -92,6 +92,7 @@ const createRepositoryDataFormatterFor = (account) => (repo) => ({
     openIssues: repo.open_issues,
     watchers: repo.watchers,
   },
+  languages: {},
   license: {
     name: repo?.license?.name || "(missing)",
     spdxId: repo?.license?.spdx_id || "(missing)",

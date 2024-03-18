@@ -7,7 +7,7 @@ const objectFromFile = async (path) => {
 };
 
 export const getExpectedDataFor = async (account, repo) => {
-  return await objectFromFile(`${account}-${repo}.json`);
+  return await objectFromFile(`${account}-${repo}.expected.json`);
 };
 
 export const getMockResponseForGetRepositories = async function (account) {
