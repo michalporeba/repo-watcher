@@ -21,7 +21,7 @@ export const resolveDefaultsFor = async (config) => {
         cache: await resolveConfig(config?.cache, createDefaultCache),
         octokit: await resolveConfig(config?.octokit, createDefaultOctokit),
         github: await resolveConfig(config?.github, createDefaultGitHub),
-        noRefreshTime: config?.noRefreshTime || 3600,
+        noRefreshSeconds: config?.noRefreshSeconds || 3600,
         resolved: true,
       };
 };

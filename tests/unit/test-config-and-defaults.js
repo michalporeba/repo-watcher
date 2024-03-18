@@ -90,4 +90,9 @@ describe("Test config default value resolution", () => {
     const second = await resolveDefaultsFor(first);
     validateDefaultConfigObject(second);
   });
+
+  test("noRefreshSeconds has a reasonable default", async () => {
+    const { noRefreshSeconds } = await resolveDefaultsFor({});
+    expect(noRefreshSeconds > 0).toBeTruthy();
+  });
 });

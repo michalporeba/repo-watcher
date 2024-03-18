@@ -12,17 +12,17 @@ import { createFakeGitHub, createThrowingGitHub } from "../doubles/github";
 expect.extend(customJestExtensions);
 
 const config = {
-  noRefreshTime: 0,
+  noRefreshSeconds: 0,
   github: createFakeGitHub,
 };
 
 const configWithNoRefreshTime = {
-  noRefreshTime: 60,
+  noRefreshSeconds: 60,
   github: createFakeGitHub,
 };
 
 const configWithNoRefreshTimeAndThrowingGitHub = {
-  noRefreshTime: 60,
+  noRefreshSeconds: 60,
   github: createThrowingGitHub,
 };
 

@@ -9,7 +9,7 @@ expect.extend(customJestExtensions);
 const config = {
   cache: { type: "mem" },
   github: createFakeGitHub,
-  noRefreshTime: 0,
+  noRefreshSeconds: 0,
 };
 
 describe("Test process state persistance", () => {

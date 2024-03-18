@@ -24,7 +24,7 @@ export const streamRepositories = async function* (accounts, config = {}) {
   for (const account of accounts) {
     const accountState = await getAccountState("github", account.name, cache);
     const inNoRefreshTime = accountState.isInNoRefreshPeriod(
-      config.noRefreshTime,
+      config.noRefreshSeconds,
     );
 
     if (inNoRefreshTime) {

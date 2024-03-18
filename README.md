@@ -115,11 +115,11 @@ for await (let repository in streamRepositories(accounts)) {
 All public methods will accept a `config` object as their last, optional parameter to alter and extend their behaviour.
 The configuration supports the following options at the moment:
 
-| Property      | Type                         | Description                                                                                                                               |
-| ------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| github        | object or a factory function | A factory method creating instance of the GitHub class used to access github API. It can be used to customise GitHub API client creation. |
-| cache         | object or a factory function | Configuration for the caching systems to persist information between function calls.                                                      |
-| noRefreshTime | integer                      | If cache contains data younger than that many seconds the API call will not be made to fetch that data.                                   |
+| Property         | Type                         | Description                                                                                                                               |
+| ---------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| github           | object or a factory function | A factory method creating instance of the GitHub class used to access github API. It can be used to customise GitHub API client creation. |
+| cache            | object or a factory function | Configuration for the caching systems to persist information between function calls.                                                      |
+| noRefreshSeconds | integer                      | If cache contains data younger than that many seconds the API call will not be made to fetch that data.                                   |
 
 ## cache
 
