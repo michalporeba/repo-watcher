@@ -12,13 +12,14 @@ import {
   createFakeGitHub,
   createThrowingGitHub,
 } from "../doubles/github";
+import { resolveDefaultsFor } from "../../src/config";
 
 expect.extend(customJestExtensions);
 
-const config = {
+const config = await resolveDefaultsFor({
   noRefreshSeconds: 0,
   github: createFakeGitHub,
-};
+});
 
 const configWithNoRefreshTime = {
   noRefreshSeconds: 60,
@@ -34,6 +35,11 @@ const configWithNoRefreshTimeAndThrowingGitHub = {
   noRefreshSeconds: 60,
   github: createThrowingGitHub,
 };
+
+const configWithThrowingGitHub = await resolveDefaultsFor({
+  noRefreshSeconds: 0,
+  github: createThrowingGitHub,
+});
 
 describe("Test getting GitHub repos", () => {
   test("get all user repos", async () => {
@@ -110,7 +116,20 @@ describe("Test getting GitHub repos", () => {
     expect(data3).toCloselyMatch(expectations, repositoryComparator);
   });
 
-  // test("cached version is used if there were no changes", async () => {
-  //   expect(1).toBeEqual(2);
-  // });
+  test.skip("cached version is used if there were no changes", async () => {
+    // plan:
+    // ensure that cache has recent version of a repo
+    const accounts = [{ name: "user1", type: "user", include: "repo-b" }];
+    const expectations = [await getExpectedDataFor("user1", "repo-b")];
+    const { data: first } = await getRepositories(accounts, config);
+    expect(first).toCloselyMatch(expectations, repositoryComparator);
+
+    // TODO: there must be a better way to manage github behaviour under test
+    const config2 = configWithThrowingGitHub;
+    config2.cache = config.cache;
+    const second = await getRepositories(accounts, config2);
+    // ensure the noRefreshPeriod is 0
+    // ensure the repository is returned
+    expect(first).toBeEqual(second);
+  });
 });

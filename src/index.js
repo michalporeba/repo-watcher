@@ -65,9 +65,13 @@ const processFromGitHub = async function* (
   const filteredRepositories = filterRepositories(repositories, accountConfig);
 
   for await (const repo of filteredRepositories) {
-    repo.languages = await github.getLanguages(repo.account, repo.name);
-    const repoPath = accountState.addRepo(repo.name);
-    await cache.set(repoPath, repo);
+    console.log(repo.times);
+    if (!repo.times?.collected || repo.times.collected < repo.times.updated) {
+      repo.languages = await github.getLanguages(repo.account, repo.name);
+      repo.times.collected = new Date().toISOString();
+      const repoPath = accountState.addRepo(repo.name);
+      await cache.set(repoPath, repo);
+    }
 
     yield repo;
   }

@@ -5,5 +5,4 @@ _It is my way to apply the Hemingway Bridge method without commiting broken code
 
 The local cache is working, however
 
-- Switch to using GitHub class instance instead of using octokit directly
-- create GitHubDoulbes - update the tests.
+- Don't update records of repos that were not updated
