@@ -8,7 +8,7 @@
     "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/unit/",
     "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/integration/",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/",
-    "wip": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/unit/test-getting-github-repos.js",
+    "wip": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage=false --watch ./tests/unit/test-fetching-of-github-data.js",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "lint:check": "eslint .",
