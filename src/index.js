@@ -3,17 +3,41 @@
 import { resolveDefaultsFor } from "./config";
 import { AccountState } from "./cache/account-state";
 import { ProcessState } from "./cache/process-state";
+import { RunState } from "./cache/run-state";
 
-export const fetchRepositories = async (_accounts, _config) => {
+export const fetchRepositories = async (accounts, config) => {
+  const state = new RunState();
+  for (const account of accounts) {
+    try {
+      const repositories = fetchAccountRepositories(account, config);
+      for await (const repository of repositories) {
+      }
+      state.accounts += 1;
+    } catch {
+      return {
+        last: state,
+      };
+    }
+  }
   return {
-    last: {
-      accounts: 0,
-      repositories: 0,
-      apicalls: {
-        github: 0,
-      },
-    },
+    last: state,
   };
+};
+
+const fetchAccountRepositories = async function* (account, config) {
+  const fetcher = getRepositoryFetcher(account.service);
+  yield* fetcher(account, config);
+};
+
+const getRepositoryFetcher = (service) => {
+  if (service == "github") {
+    return fetchGitHubRepositories;
+  }
+};
+
+const fetchGitHubRepositories = async function* (account, config) {
+  const { github } = await resolveDefaultsFor(config);
+  yield* github.streamRepositories(account);
 };
 
 export const getRepositories = async (accounts, config) => {

@@ -8,6 +8,7 @@ import { githubUser } from "../../src";
 const createConfig = async function ({ githubThrow, githubThrowAll } = {}) {
   const config = await resolveDefaultsFor({
     noRefreshSeconds: 0, // force API use for now, it will be removed
+    cache: "mem",
     github: createConfigurableFakeGitHub,
   });
   if (githubThrow) {
@@ -29,7 +30,7 @@ const ensureGitHubStreamRepositoriesThrows = async (config) => {
 };
 
 describe("Fetching data from GitHub", () => {
-  test.only("Fething returns a status even if it couldn't fetch anything", async () => {
+  test("Fetching returns a status even if it couldn't fetch anything", async () => {
     const config = await createConfig({ githubThrowAll: true });
     await ensureGitHubStreamRepositoriesThrows(config);
     const account = githubUser("michalporeba");
@@ -39,6 +40,21 @@ describe("Fetching data from GitHub", () => {
         accounts: 0,
         repositories: 0,
         apicalls: { github: 0 },
+      },
+    });
+  });
+
+  test("Fetching in a single run returns correct status", async () => {
+    const config = await createConfig();
+    const account = githubUser("user1");
+    const status = await fetchRepositories([account], config);
+    expect(status).toMatchObject({
+      last: {
+        accounts: 1,
+        repositories: 0,
+        apicalls: {
+          github: expect.any(Number),
+        },
       },
     });
   });
