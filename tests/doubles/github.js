@@ -10,6 +10,50 @@ class FakeGitHub {
   };
 }
 
+class ConfigurableFakeGitHub {
+  #remainingCalls = 1_000;
+  #throwOnCall = false;
+  #throwOnAllCalls = false;
+
+  streamRepositories = async function* ({ type, name }) {
+    if (this.#throwOnAllCalls) {
+      unexpectedCall("streamRepositories", [type, name]);
+    }
+    if (this.#remainingCalls <= 0) {
+      apiRateExceeded("streamRepositories", [type, name]);
+    }
+    this.#remainingCalls -= 1;
+  };
+
+  getLanguages = async function (owner, repo) {
+    if (this.#throwOnCall || this.#throwOnAllCalls) {
+      unexpectedCall("getLanguages", [owner, repo], this.reason);
+    }
+    if (this.#remainingCalls <= 0) {
+      apiRateExceeded("getLanguages", [type, name]);
+    }
+    this.#remainingCalls -= 1;
+  };
+
+  getRemainingLimit = async function () {
+    // this always works, regardless of the actual limit
+    // and doesn't reduce the availabile limit
+    return Promise.resolve(this.#remainingCalls);
+  };
+
+  setRemainingLimit = function (newLimit) {
+    this.#remainingCalls = newLimit;
+  };
+
+  throwOnCall = async function (value = true) {
+    this.#throwOnCall = value;
+  };
+
+  throwOnAllCalls = async function (value = true) {
+    this.#throwOnAllCalls = value;
+  };
+}
+
 class DepletedGitHub {
   reason = "rate limit is too low!";
   // eslint-disable-next-line require-yield
@@ -52,6 +96,10 @@ export const createFakeGitHub = async function () {
   return new FakeGitHub();
 };
 
+export const createConfigurableFakeGitHub = async function () {
+  return new ConfigurableFakeGitHub();
+};
+
 export const createThrowingGitHub = async function () {
   return new ThrowingGitHub();
 };
@@ -70,6 +118,14 @@ const getLanguages = async function (owner, repo) {
 const unexpectedCall = (functionName, parameters = []) => {
   const values = parameters.join(", ");
   const message = `This call to ${functionName}(${values}) should not have been made!`;
+  console.error(message);
+  throw new Error(message);
+};
+
+const apiRateExceeded = (functionName, parameters = []) => {
+  const values = parameters.join(", ");
+  const message = `GitHub API call was attempted ${functionName}(${values}), but the API limit is exhausted!`;
+  console.error(message);
   throw new Error(message);
 };
 

@@ -4,6 +4,18 @@ import { resolveDefaultsFor } from "./config";
 import { AccountState } from "./cache/account-state";
 import { ProcessState } from "./cache/process-state";
 
+export const fetchRepositories = async (accounts, config) => {
+  return {
+    last: {
+      accounts: 0,
+      repositories: 0,
+      apicalls: {
+        github: 0,
+      },
+    },
+  };
+};
+
 export const getRepositories = async (accounts, config) => {
   const { cache } = await resolveDefaultsFor(config);
   const repositories = [];
@@ -41,6 +53,9 @@ export const streamRepositories = async function* (accounts, config) {
 
   await state.saveTo(cache);
 };
+
+export const githubUser = (name) => ({ service: "github", type: "user", name });
+export const githubOrg = (name) => ({ service: "github", type: "org", name });
 
 const filterRepositories = async function* (repositories, { include }) {
   for await (const repository of repositories) {
