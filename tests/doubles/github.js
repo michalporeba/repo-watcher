@@ -17,20 +17,21 @@ class ConfigurableFakeGitHub {
 
   streamRepositories = async function* ({ type, name }) {
     if (this.#throwOnAllCalls) {
-      unexpectedCall("streamRepositories", [type, name]);
+      return unexpectedCall("streamRepositories", [type, name]);
     }
     if (this.#remainingCalls <= 0) {
-      apiRateExceeded("streamRepositories", [type, name]);
+      return apiRateExceeded("streamRepositories", [type, name]);
     }
     this.#remainingCalls -= 1;
+    return Promise.resolve([]);
   };
 
   getLanguages = async function (owner, repo) {
     if (this.#throwOnCall || this.#throwOnAllCalls) {
-      unexpectedCall("getLanguages", [owner, repo], this.reason);
+      return unexpectedCall("getLanguages", [owner, repo], this.reason);
     }
     if (this.#remainingCalls <= 0) {
-      apiRateExceeded("getLanguages", [type, name]);
+      return apiRateExceeded("getLanguages", [type, name]);
     }
     this.#remainingCalls -= 1;
   };
@@ -117,16 +118,14 @@ const getLanguages = async function (owner, repo) {
 
 const unexpectedCall = (functionName, parameters = []) => {
   const values = parameters.join(", ");
-  const message = `This call to ${functionName}(${values}) should not have been made!`;
-  console.error(message);
+  const message = `The call to ${functionName}(${values}) should not have been made!`;
   throw new Error(message);
 };
 
 const apiRateExceeded = (functionName, parameters = []) => {
   const values = parameters.join(", ");
   const message = `GitHub API call was attempted ${functionName}(${values}), but the API limit is exhausted!`;
-  console.error(message);
-  throw new Error(message);
+  return new Error(message);
 };
 
 const objectFromFile = async (path) => {
