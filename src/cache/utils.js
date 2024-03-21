@@ -15,7 +15,7 @@ export const createCache = async (config = {}) => {
       return Promise.resolve(new NoopCache());
     case "mem":
       return Promise.resolve(new InMemoryCache());
-    case "globalmem":
+    case "gmem":
       return Promise.resolve(globalInMemoryCache);
     default:
       return Promise.reject(new Error(`Unknown cache type: ${type}!`));

@@ -9,7 +9,7 @@ import { resolveDefaultsFor } from "../../src/config";
 expect.extend(customJestExtensions);
 
 const config = {
-  cache: { type: "mem" },
+  cache: { type: "gmem" },
   github: createFakeGitHub,
   noRefreshSeconds: 0,
 };
