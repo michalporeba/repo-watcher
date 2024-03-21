@@ -41,6 +41,13 @@ const fetchGitHubRepositories = async function* (account, config) {
   yield* github.streamRepositories(account);
 };
 
+export const getRepositories2 = async (config) => {
+  const { cache } = await resolveDefaultsFor(config);
+  const repositories = [];
+
+  return [];
+};
+
 export const getRepositories = async (accounts, config) => {
   const { cache } = await resolveDefaultsFor(config);
   const repositories = [];

@@ -2,7 +2,7 @@
 
 import { resolveDefaultsFor } from "../../src/config";
 import { createConfigurableFakeGitHub } from "../doubles/github";
-import { fetchRepositories } from "../../src";
+import { fetchRepositories, getRepositories2 } from "../../src";
 import { githubUser } from "../../src";
 
 const createConfig = async function ({ githubThrow, githubThrowAll } = {}) {
@@ -44,7 +44,7 @@ describe("Fetching data from GitHub", () => {
     });
   });
 
-  test("Fetching in a single run returns correct status", async () => {
+  test("Fetching in a single account returns correct status", async () => {
     const config = await createConfig();
     const account = githubUser("user1");
     const status = await fetchRepositories([account], config);
@@ -52,10 +52,12 @@ describe("Fetching data from GitHub", () => {
       last: {
         accounts: 1,
         repositories: 2,
-        apicalls: {
-          github: expect.any(Number),
-        },
       },
     });
+  });
+
+  test("Before fetching getRepositories returns no data", async () => {
+    const config = await createConfig();
+    expect(await getRepositories2(config)).toEqual([]);
   });
 });

@@ -23,6 +23,7 @@ class ConfigurableFakeGitHub {
       return apiRateExceeded("streamRepositories", [type, name]);
     }
     this.#remainingCalls -= 1;
+
     const configuration = await objectFromFile("repositories.json");
     for (const repository of configuration[name]) {
       yield await objectFromFile(`${name}-${repository}.first.json`);
