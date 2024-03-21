@@ -4,7 +4,7 @@ import { resolveDefaultsFor } from "./config";
 import { AccountState } from "./cache/account-state";
 import { ProcessState } from "./cache/process-state";
 
-export const fetchRepositories = async (accounts, config) => {
+export const fetchRepositories = async (_accounts, _config) => {
   return {
     last: {
       accounts: 0,
@@ -80,7 +80,6 @@ const processFromGitHub = async function* (
   const filteredRepositories = filterRepositories(repositories, accountConfig);
 
   for await (const repo of filteredRepositories) {
-    console.log(repo.times);
     if (!repo.times?.collected || repo.times.collected < repo.times.updated) {
       repo.languages = await github.getLanguages(repo.account, repo.name);
       repo.times.collected = new Date().toISOString();

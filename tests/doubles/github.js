@@ -23,15 +23,15 @@ class ConfigurableFakeGitHub {
       return apiRateExceeded("streamRepositories", [type, name]);
     }
     this.#remainingCalls -= 1;
-    return Promise.resolve([]);
+    yield;
   };
 
   getLanguages = async function (owner, repo) {
     if (this.#throwOnCall || this.#throwOnAllCalls) {
-      return unexpectedCall("getLanguages", [owner, repo], this.reason);
+      return unexpectedCall("getLanguages", [owner, repo]);
     }
     if (this.#remainingCalls <= 0) {
-      return apiRateExceeded("getLanguages", [type, name]);
+      return apiRateExceeded("getLanguages", [owner, repo]);
     }
     this.#remainingCalls -= 1;
   };
