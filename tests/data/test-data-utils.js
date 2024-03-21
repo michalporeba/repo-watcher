@@ -10,6 +10,11 @@ export const getExpectedDataFor = async (account, repo) => {
   return await objectFromFile(`${account}-${repo}.expected.json`);
 };
 
+export const createMinimalExpectationFor = (account, name) => ({
+  account,
+  name,
+});
+
 export const getMockResponseForGetRepositories = async function (account) {
   return await objectFromFile(`get-repos-for-${account}-response.json`);
 };

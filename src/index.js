@@ -4,25 +4,51 @@ import { resolveDefaultsFor } from "./config";
 import { AccountState } from "./cache/account-state";
 import { ProcessState } from "./cache/process-state";
 import { RunState } from "./cache/run-state";
+import { KnownAccounts } from "./cache/known-accounts";
 
-export const fetchRepositories = async (accounts, config) => {
-  const state = new RunState();
+export const fetchRepositories = async (config, accounts) => {
+  const { cache } = await resolveDefaultsFor(config);
+  const runState = new RunState();
+  console.log(cache);
+  const knownAccounts = await KnownAccounts.getFrom(cache);
+
   for (const account of accounts) {
     try {
       const repositories = fetchAccountRepositories(account, config);
-      for await (const repository of repositories) {
-        state.repositories += 1;
+      const accountState = new AccountState(account.service, account.name);
+      for await (const repo of repositories) {
+        const repoPath = accountState.addRepo(repo.name);
+        await cache.set(repoPath, repo);
+        runState.repositories += 1;
       }
-      state.accounts += 1;
+      await accountState.saveTo(cache);
+      knownAccounts.register(accountState);
+      runState.accounts += 1;
     } catch {
       return {
-        last: state,
+        last: runState,
       };
     }
+
+    await knownAccounts.saveTo(cache);
   }
   return {
-    last: state,
+    last: runState,
   };
+};
+
+export const getRepositories2 = async (config) => {
+  const { cache } = await resolveDefaultsFor(config);
+  const repositories = [];
+  const knownAccounts = await KnownAccounts.getFrom(cache);
+  for await (const account of knownAccounts.stream()) {
+    const accountState = await AccountState.getFrom(cache, account.path);
+    for await (const repository of accountState.streamRepositoriesFrom(cache)) {
+      repositories.push(repository);
+    }
+  }
+
+  return repositories;
 };
 
 const fetchAccountRepositories = async function* (account, config) {
@@ -39,13 +65,6 @@ const getRepositoryFetcher = (service) => {
 const fetchGitHubRepositories = async function* (account, config) {
   const { github } = await resolveDefaultsFor(config);
   yield* github.streamRepositories(account);
-};
-
-export const getRepositories2 = async (config) => {
-  const { cache } = await resolveDefaultsFor(config);
-  const repositories = [];
-
-  return [];
 };
 
 export const getRepositories = async (accounts, config) => {

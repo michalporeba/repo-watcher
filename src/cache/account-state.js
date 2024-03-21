@@ -1,7 +1,10 @@
 "use strict";
 
 export class AccountState {
+  static #LIST_KEY = "accounts.json";
+
   constructor(service, account) {
+    this.service = service;
     this.account = account;
     this.path = AccountState.#accountPath(service, account);
     this.timestamp = 0;
@@ -42,6 +45,13 @@ export class AccountState {
     if (data) {
       Object.assign(this, data);
     }
+  }
+
+  static async getFrom(cache, path) {
+    const state = new AccountState();
+    const data = await cache.get(path);
+    Object.assign(state, data);
+    return state;
   }
 
   static #accountPath(service, account) {
