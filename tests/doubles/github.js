@@ -23,7 +23,10 @@ class ConfigurableFakeGitHub {
       return apiRateExceeded("streamRepositories", [type, name]);
     }
     this.#remainingCalls -= 1;
-    yield;
+    const configuration = await objectFromFile("repositories.json");
+    for (const repository of configuration[name]) {
+      yield await objectFromFile(`${name}-${repository}.first.json`);
+    }
   };
 
   getLanguages = async function (owner, repo) {

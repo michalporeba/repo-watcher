@@ -11,6 +11,7 @@ export const fetchRepositories = async (accounts, config) => {
     try {
       const repositories = fetchAccountRepositories(account, config);
       for await (const repository of repositories) {
+        state.repositories += 1;
       }
       state.accounts += 1;
     } catch {

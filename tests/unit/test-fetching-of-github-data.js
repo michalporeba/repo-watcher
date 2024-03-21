@@ -51,7 +51,7 @@ describe("Fetching data from GitHub", () => {
     expect(status).toMatchObject({
       last: {
         accounts: 1,
-        repositories: 0,
+        repositories: 2,
         apicalls: {
           github: expect.any(Number),
         },
