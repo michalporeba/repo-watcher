@@ -40,15 +40,24 @@ export const fetchRepositories = async (config, accounts) => {
 export const getRepositories2 = async (config) => {
   const { cache } = await resolveDefaultsFor(config);
   const repositories = [];
-  const knownAccounts = await KnownAccounts.getFrom(cache);
-  for await (const account of knownAccounts.stream()) {
-    const accountState = await AccountState.getFrom(cache, account.path);
-    for await (const repository of accountState.streamRepositoriesFrom(cache)) {
-      repositories.push(repository);
-    }
+
+  for await (const repository of streamRepositories2(config)) {
+    repositories.push(repository);
   }
 
   return repositories;
+};
+
+export const streamRepositories2 = async function* (config) {
+  const { cache } = await resolveDefaultsFor(config);
+  const knownAccounts = await KnownAccounts.getFrom(cache);
+
+  for await (const account of knownAccounts.stream()) {
+    const accountState = await AccountState.getFrom(cache, account.path);
+    for await (const repository of accountState.streamRepositoriesFrom(cache)) {
+      yield repository;
+    }
+  }
 };
 
 const fetchAccountRepositories = async function* (account, config) {
