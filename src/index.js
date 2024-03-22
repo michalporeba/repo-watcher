@@ -2,7 +2,6 @@
 
 import { resolveDefaultsFor } from "./config";
 import { AccountState } from "./cache/account-state";
-import { ProcessState } from "./cache/process-state";
 import { RunState } from "./cache/run-state";
 import { KnownAccounts } from "./cache/known-accounts";
 
@@ -13,9 +12,11 @@ export const fetchRepositories = async (config, accounts) => {
 
   for (const account of accounts) {
     try {
-      const repositories = fetchAccountRepositories(account, config);
+      const repositories = fetchAccountRepositories(config, account);
+      const filteredRepositories = filterRepositories(repositories, account);
       const accountState = new AccountState(account.service, account.name);
-      for await (const repo of repositories) {
+
+      for await (const repo of filteredRepositories) {
         const repoPath = accountState.addRepo(repo.name);
         await cache.set(repoPath, repo);
         runState.repositories += 1;
@@ -23,7 +24,8 @@ export const fetchRepositories = async (config, accounts) => {
       await accountState.saveTo(cache);
       knownAccounts.register(accountState);
       runState.accounts += 1;
-    } catch {
+    } catch (err) {
+      console.warn(err);
       return {
         last: runState,
       };
@@ -58,9 +60,9 @@ export const streamRepositories = async function* (config) {
   }
 };
 
-const fetchAccountRepositories = async function* (account, config) {
+const fetchAccountRepositories = async function* (config, account) {
   const fetcher = getRepositoryFetcher(account.service);
-  yield* fetcher(account, config);
+  yield* fetcher(config, account);
 };
 
 const getRepositoryFetcher = (service) => {
@@ -69,51 +71,22 @@ const getRepositoryFetcher = (service) => {
   }
 };
 
-const fetchGitHubRepositories = async function* (account, config) {
+const fetchGitHubRepositories = async function* (config, account) {
   const { github } = await resolveDefaultsFor(config);
   yield* github.streamRepositories(account);
 };
 
-export const getRepositories1 = async (accounts, config) => {
-  const { cache } = await resolveDefaultsFor(config);
-  const repositories = [];
-
-  for await (const repository of streamRepositories(accounts, config)) {
-    repositories.push(repository);
-  }
-
-  return {
-    data: repositories,
-    state: await ProcessState.getFrom(cache),
-  };
+export const githubUser = (name, extensions = {}) => {
+  let data = { service: "github", type: "user", name };
+  Object.assign(data, extensions);
+  return data;
 };
 
-export const streamRepositories1 = async function* (accounts, config) {
-  const { cache, github } = await resolveDefaultsFor(config);
-  const state = new ProcessState();
-
-  for (const account of accounts) {
-    const accountState = await getAccountState("github", account.name, cache);
-    const inNoRefreshTime = accountState.isInNoRefreshPeriod(
-      config.noRefreshSeconds,
-    );
-
-    if (inNoRefreshTime || (await github.getRemainingLimit()) < 10) {
-      yield* processLocally(account, accountState, cache);
-    } else {
-      yield* processFromGitHub(account, accountState, cache, github);
-      state.repositories.discovered += accountState.countRepositories();
-      state.repositories.collected += accountState.countRepositories();
-    }
-
-    await accountState.saveTo(cache);
-  }
-
-  await state.saveTo(cache);
+export const githubOrg = (name, extensions = {}) => {
+  let data = { service: "github", type: "org", name };
+  Object.assign(data, extensions);
+  return data;
 };
-
-export const githubUser = (name) => ({ service: "github", type: "user", name });
-export const githubOrg = (name) => ({ service: "github", type: "org", name });
 
 const filterRepositories = async function* (repositories, { include }) {
   for await (const repository of repositories) {

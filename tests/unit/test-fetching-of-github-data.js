@@ -65,4 +65,15 @@ describe("Fetching data from GitHub", () => {
     const repositories = await getRepositories(config);
     expect(repositories).toCloselyMatch(expectations, repositoryComparator);
   });
+
+  test("Fetching can be limited to a specific repository", async () => {
+    const config = await createTestConfig();
+    const expectations = [createMinimalExpectationFor("user1", "repo-b")];
+
+    const accounts = [githubUser("user1", { include: ["repo-b"] })];
+    await fetchRepositories(config, accounts);
+    const repositories = await getRepositories(config);
+    console.log(repositories);
+    expect(repositories).toCloselyMatch(expectations, repositoryComparator);
+  });
 });
