@@ -1,6 +1,6 @@
 "use strict";
 
-import { getRepositories } from "../../src/index";
+import { getRepositories1 } from "../../src/index";
 import {
   getExpectedDataFor,
   repositoryComparator,
@@ -49,21 +49,21 @@ describe("Test getting GitHub repos", () => {
       await getExpectedDataFor("user1", "repo-b"),
     ];
 
-    const { data } = await getRepositories(accounts, config);
+    const { data } = await getRepositories1(accounts, config);
     expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
 
   test("get specific user repo", async () => {
     const accounts = [{ name: "user1", type: "user", include: "repo-b" }];
     const expectations = [await getExpectedDataFor("user1", "repo-b")];
-    const { data } = await getRepositories(accounts, config);
+    const { data } = await getRepositories1(accounts, config);
     expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
 
   test("get all org repos", async () => {
     const accounts = [{ name: "orga", type: "org" }];
     const expectations = [await getExpectedDataFor("orga", "repo-1")];
-    const { data } = await getRepositories(accounts, config);
+    const { data } = await getRepositories1(accounts, config);
     expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
 
@@ -77,13 +77,13 @@ describe("Test getting GitHub repos", () => {
       await getExpectedDataFor("user1", "repo-b"),
       await getExpectedDataFor("orga", "repo-1"),
     ];
-    const { data } = await getRepositories(accounts, config);
+    const { data } = await getRepositories1(accounts, config);
     expect(data).toCloselyMatch(expectations, repositoryComparator);
   });
 
   test("No API calls are attempted if rate limit is low", async () => {
     const accounts = [{ name: "not-cached-user", type: "user" }];
-    const { data } = await getRepositories(accounts, configWithDepletedGitHub);
+    const { data } = await getRepositories1(accounts, configWithDepletedGitHub);
     expect(data).toEqual([]);
   });
 
@@ -98,18 +98,18 @@ describe("Test getting GitHub repos", () => {
     const accounts = [{ name: "user1", type: "user", include: "repo-b" }];
     const expectations = [await getExpectedDataFor("user1", "repo-b")];
 
-    const { data: data1 } = await getRepositories(accounts, config);
+    const { data: data1 } = await getRepositories1(accounts, config);
     expect(data1).toCloselyMatch(expectations, repositoryComparator);
 
     // this will throw if GitHub object is used
-    const { data: data2 } = await getRepositories(
+    const { data: data2 } = await getRepositories1(
       accounts,
       configWithNoRefreshTimeAndThrowingGitHub,
     );
     expect(data2).toCloselyMatch(expectations, repositoryComparator);
 
     jest.advanceTimersByTime(120_000);
-    const { data: data3 } = await getRepositories(
+    const { data: data3 } = await getRepositories1(
       accounts,
       configWithNoRefreshTime,
     );
@@ -121,13 +121,13 @@ describe("Test getting GitHub repos", () => {
     // ensure that cache has recent version of a repo
     const accounts = [{ name: "user1", type: "user", include: "repo-b" }];
     const expectations = [await getExpectedDataFor("user1", "repo-b")];
-    const { data: first } = await getRepositories(accounts, config);
+    const { data: first } = await getRepositories1(accounts, config);
     expect(first).toCloselyMatch(expectations, repositoryComparator);
 
     // TODO: there must be a better way to manage github behaviour under test
     const config2 = configWithThrowingGitHub;
     config2.cache = config.cache;
-    const second = await getRepositories(accounts, config2);
+    const second = await getRepositories1(accounts, config2);
     // ensure the noRefreshPeriod is 0
     // ensure the repository is returned
     expect(first).toBeEqual(second);

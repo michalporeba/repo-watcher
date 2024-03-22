@@ -75,7 +75,7 @@ The functionality is very limited at the moment, but it is there and working.
 At the moment it possible to get repos from a list of accounts. Give it a go!
 
 ```javascript
-import { getRepositories } from "repo-watcher";
+import { fetchRepositories, getRepositories } from "repo-watcher";
 
 const account = [
   { name: "alphagov", type: "org" },
@@ -86,8 +86,9 @@ const account = [
   },
 ];
 
-const { data } = await getRepositories(accounts);
-console.log(data);
+await fetchRepositories(accounts);
+const repositories = await getRepositories();
+console.log(repositories);
 ```
 
 The above will return all `alphagov` repositories and two specific repositories by `michaporeba`. This approach will work for small number of accounts and repositories.

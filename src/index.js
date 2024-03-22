@@ -36,18 +36,18 @@ export const fetchRepositories = async (config, accounts) => {
   };
 };
 
-export const getRepositories2 = async (config) => {
+export const getRepositories = async (config) => {
   const { cache } = await resolveDefaultsFor(config);
   const repositories = [];
 
-  for await (const repository of streamRepositories2(config)) {
+  for await (const repository of streamRepositories(config)) {
     repositories.push(repository);
   }
 
   return repositories;
 };
 
-export const streamRepositories2 = async function* (config) {
+export const streamRepositories = async function* (config) {
   const { cache } = await resolveDefaultsFor(config);
   const knownAccounts = await KnownAccounts.getFrom(cache);
 
@@ -75,11 +75,11 @@ const fetchGitHubRepositories = async function* (account, config) {
   yield* github.streamRepositories(account);
 };
 
-export const getRepositories = async (accounts, config) => {
+export const getRepositories1 = async (accounts, config) => {
   const { cache } = await resolveDefaultsFor(config);
   const repositories = [];
 
-  for await (const repository of streamRepositories(accounts, config)) {
+  for await (const repository of streamRepositories1(accounts, config)) {
     repositories.push(repository);
   }
 
@@ -89,7 +89,7 @@ export const getRepositories = async (accounts, config) => {
   };
 };
 
-export const streamRepositories = async function* (accounts, config) {
+export const streamRepositories1 = async function* (accounts, config) {
   const { cache, github } = await resolveDefaultsFor(config);
   const state = new ProcessState();
 

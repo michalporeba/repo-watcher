@@ -1,6 +1,6 @@
 "use strict";
 
-import { getRepositories } from "../../src/index";
+import { getRepositories1 } from "../../src/index";
 import customJestExtensions from "../data/jest-extensions";
 import { createFakeGitHub } from "../doubles/github";
 import { ProcessState } from "../../src/cache/process-state";
@@ -22,7 +22,7 @@ describe("Test process state persistance", () => {
       { name: "user1", type: "user" },
       { name: "orga", type: "org" },
     ];
-    const { state } = await getRepositories(accounts, config);
+    const { state } = await getRepositories1(accounts, config);
 
     expect(state).toMatchObject(await ProcessState.getFrom(cache));
     expect(state).toMatchObject({

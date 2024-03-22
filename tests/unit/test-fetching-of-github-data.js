@@ -2,7 +2,7 @@
 
 import { resolveDefaultsFor } from "../../src/config";
 import { createConfigurableFakeGitHub } from "../doubles/github";
-import { fetchRepositories, getRepositories2 } from "../../src";
+import { fetchRepositories, getRepositories } from "../../src";
 import { githubUser } from "../../src";
 import {
   createMinimalExpectationFor,
@@ -65,7 +65,7 @@ describe("Fetching data from GitHub", () => {
 
   test("Before fetching getRepositories returns no data", async () => {
     const config = await createConfig();
-    expect(await getRepositories2(config)).toEqual([]);
+    expect(await getRepositories(config)).toEqual([]);
   });
 
   test("After successful fetching getRepositories returns all the data by default", async () => {
@@ -77,7 +77,7 @@ describe("Fetching data from GitHub", () => {
     ];
 
     await fetchRepositories(config, accounts);
-    const repositories = await getRepositories2(config);
+    const repositories = await getRepositories(config);
     expect(repositories).toCloselyMatch(expectations, repositoryComparator);
   });
 });
