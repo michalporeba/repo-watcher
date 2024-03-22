@@ -3,6 +3,9 @@
 
 name: Node.js CI
 
+runs:
+  using: 'node20'
+
 on:
   push:
     branches: [ "main" ]
