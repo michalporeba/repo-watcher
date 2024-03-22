@@ -1,7 +1,7 @@
 "use strict";
 
 import { fetchRepositories, getRepositories } from "../../src";
-import { githubUser } from "../../src";
+import { githubUser, githubOrg } from "../../src";
 import {
   createMinimalExpectationFor,
   getAllTestAccounts,
@@ -25,8 +25,8 @@ describe("Fetching data from GitHub", () => {
   test("Fetching returns a status even if it couldn't fetch anything", async () => {
     const config = await createTestConfig({ githubThrowAll: true });
     await ensureGitHubStreamRepositoriesThrows(config);
-    const account = githubUser("michalporeba");
-    const status = await fetchRepositories(config, [account]);
+    const account = [githubUser("michalporeba")];
+    const status = await fetchRepositories(config, account);
     expect(status).toMatchObject({
       last: {
         accounts: 0,
@@ -38,8 +38,8 @@ describe("Fetching data from GitHub", () => {
 
   test("Fetching in a single account returns correct status", async () => {
     const config = await createTestConfig();
-    const account = githubUser("user1");
-    const status = await fetchRepositories(config, [account]);
+    const query = [githubUser("user1")];
+    const status = await fetchRepositories(config, query);
     expect(status).toMatchObject({
       last: {
         accounts: 1,
@@ -68,10 +68,25 @@ describe("Fetching data from GitHub", () => {
 
   test("Fetching can be limited to a specific repository", async () => {
     const config = await createTestConfig();
+    const query = [githubUser("user1", { include: ["repo-b"] })];
     const expectations = [createMinimalExpectationFor("user1", "repo-b")];
 
-    const accounts = [githubUser("user1", { include: ["repo-b"] })];
-    await fetchRepositories(config, accounts);
+    await fetchRepositories(config, query);
+    const repositories = await getRepositories(config);
+    expect(repositories).toCloselyMatch(expectations, repositoryComparator);
+  });
+
+  test("Fetching is additive", async () => {
+    const config = await createTestConfig();
+    const expectations = [
+      createMinimalExpectationFor("user1", "repo-a"),
+      createMinimalExpectationFor("user1", "repo-b"),
+      createMinimalExpectationFor("orga", "repo-1"),
+    ];
+
+    await fetchRepositories(config, [githubUser("user1")]);
+    await fetchRepositories(config, [githubOrg("orga")]);
+
     const repositories = await getRepositories(config);
     console.log(repositories);
     expect(repositories).toCloselyMatch(expectations, repositoryComparator);
