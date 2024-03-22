@@ -9,7 +9,6 @@ import { KnownAccounts } from "./cache/known-accounts";
 export const fetchRepositories = async (config, accounts) => {
   const { cache } = await resolveDefaultsFor(config);
   const runState = new RunState();
-  console.log(cache);
   const knownAccounts = await KnownAccounts.getFrom(cache);
 
   for (const account of accounts) {

@@ -1,7 +1,4 @@
-import {
-  createOctokit as createDefaultOctokit,
-  createGitHub as createDefaultGitHub,
-} from "./github-utils";
+import { createGitHub as createDefaultGitHub } from "./github-utils";
 import { createCache as createDefaultCache } from "./cache/utils";
 
 const resolveConfig = async (config, factory) => {

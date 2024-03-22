@@ -6,9 +6,8 @@
  * The checks goes beyond ensuring a property exists.
  */
 
-import { createOctokit } from "../../src/github-utils";
+import { createGitHub } from "../../src/github-utils";
 import customJestExtensions from "../data/jest-extensions";
-import { GitHub } from "../../src/github";
 
 const NON_EMPTY_STRING_REGEX = /.+/;
 const URL_REGEX =
@@ -78,8 +77,7 @@ const validateRepositories = async (repositoryStream) => {
   expect(repositories > 0).toBeTruthy();
 };
 
-const octokit = await createOctokit();
-const github = new GitHub(octokit);
+const github = await createGitHub();
 
 describe("GitHub - Octokit wrapper", () => {
   test("can get user repositories", async () => {
