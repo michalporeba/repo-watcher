@@ -9,5 +9,3 @@ The local cache is working, however
 - Update the tests to have better separation and control of fetching and return
 - Remove the noRefreshSeconds option - fetch needs to finish a run, or explicitly reset the run. In the future a max run length might be useful.
 - Don't update records of repos that were not updated
-- The cache keys should not have file extensions - this should be implementation detail.
-- config should not resolve octokit
