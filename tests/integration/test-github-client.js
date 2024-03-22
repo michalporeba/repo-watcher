@@ -77,7 +77,7 @@ const validateRepositories = async (repositoryStream) => {
   expect(repositories > 0).toBeTruthy();
 };
 
-const github = await createGitHub();
+const github = createGitHub();
 
 describe("GitHub - Octokit wrapper", () => {
   test("can get user repositories", async () => {

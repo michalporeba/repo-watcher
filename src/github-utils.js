@@ -8,12 +8,12 @@ export const GITHUB_HEADERS = {
   "X-GitHub-Api-Version": "2022-11-28",
 };
 
-export const createGitHub = async (config = {}) => {
-  const octokit = await createOctokit();
+export const createGitHub = (config = {}) => {
+  const octokit = createOctokit();
   return new GitHub(octokit, config);
 };
 
-export const createOctokit = async () => {
+export const createOctokit = () => {
   const CustomOctokit = Octokit.plugin(rateLimitsPlugin);
   return new CustomOctokit({
     auth: process.env.GITHUB_TOKEN,
