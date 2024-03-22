@@ -37,7 +37,6 @@ export const fetchRepositories = async (config, accounts) => {
 };
 
 export const getRepositories = async (config) => {
-  const { cache } = await resolveDefaultsFor(config);
   const repositories = [];
 
   for await (const repository of streamRepositories(config)) {
@@ -79,7 +78,7 @@ export const getRepositories1 = async (accounts, config) => {
   const { cache } = await resolveDefaultsFor(config);
   const repositories = [];
 
-  for await (const repository of streamRepositories1(accounts, config)) {
+  for await (const repository of streamRepositories(accounts, config)) {
     repositories.push(repository);
   }
 

@@ -1,6 +1,7 @@
 "use strict";
 
 import fs from "fs/promises";
+import { githubOrg, githubUser } from "../../src";
 
 const objectFromFile = async (path) => {
   return JSON.parse(await fs.readFile(`./tests/data/${path}`, "utf8"));
@@ -28,4 +29,8 @@ export const getRepositoriesFor = async function* (account) {
 
 export const repositoryComparator = (expected, actual) => {
   return expected.account === actual.account && expected.name === actual.name;
+};
+
+export const getAllTestAccounts = () => {
+  return [githubUser("user1"), githubOrg("orga")];
 };

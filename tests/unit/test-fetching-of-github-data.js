@@ -1,31 +1,16 @@
 "use strict";
 
-import { resolveDefaultsFor } from "../../src/config";
-import { createConfigurableFakeGitHub } from "../doubles/github";
 import { fetchRepositories, getRepositories } from "../../src";
 import { githubUser } from "../../src";
 import {
   createMinimalExpectationFor,
+  getAllTestAccounts,
   repositoryComparator,
 } from "../data/test-data-utils";
 import customJestExtensions from "../data/jest-extensions";
+import { createTestConfig } from "../utils/config";
 
 expect.extend(customJestExtensions);
-
-const createConfig = async function ({ githubThrow, githubThrowAll } = {}) {
-  const config = await resolveDefaultsFor({
-    noRefreshSeconds: 0, // force API use for now, it will be removed
-    cache: { type: "mem" },
-    github: createConfigurableFakeGitHub,
-  });
-  if (githubThrow) {
-    config.github.throwOnCall();
-  }
-  if (githubThrowAll) {
-    config.github.throwOnAllCalls();
-  }
-  return config;
-};
 
 const ensureGitHubStreamRepositoriesThrows = async (config) => {
   async function exerciseTheGenerator() {
@@ -38,7 +23,7 @@ const ensureGitHubStreamRepositoriesThrows = async (config) => {
 
 describe("Fetching data from GitHub", () => {
   test("Fetching returns a status even if it couldn't fetch anything", async () => {
-    const config = await createConfig({ githubThrowAll: true });
+    const config = await createTestConfig({ githubThrowAll: true });
     await ensureGitHubStreamRepositoriesThrows(config);
     const account = githubUser("michalporeba");
     const status = await fetchRepositories(config, [account]);
@@ -52,7 +37,7 @@ describe("Fetching data from GitHub", () => {
   });
 
   test("Fetching in a single account returns correct status", async () => {
-    const config = await createConfig();
+    const config = await createTestConfig();
     const account = githubUser("user1");
     const status = await fetchRepositories(config, [account]);
     expect(status).toMatchObject({
@@ -64,19 +49,19 @@ describe("Fetching data from GitHub", () => {
   });
 
   test("Before fetching getRepositories returns no data", async () => {
-    const config = await createConfig();
+    const config = await createTestConfig();
     expect(await getRepositories(config)).toEqual([]);
   });
 
-  test("After successful fetching getRepositories returns all the data by default", async () => {
-    const config = await createConfig();
-    const accounts = [githubUser("user1")];
+  test("After successful fetching getRepositories returns all the data", async () => {
+    const config = await createTestConfig();
     const expectations = [
       createMinimalExpectationFor("user1", "repo-a"),
       createMinimalExpectationFor("user1", "repo-b"),
+      createMinimalExpectationFor("orga", "repo-1"),
     ];
 
-    await fetchRepositories(config, accounts);
+    await fetchRepositories(config, getAllTestAccounts());
     const repositories = await getRepositories(config);
     expect(repositories).toCloselyMatch(expectations, repositoryComparator);
   });
