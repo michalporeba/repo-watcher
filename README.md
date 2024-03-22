@@ -1,3 +1,5 @@
+![test status](https://github.com/michalporeba/repo-watcher/actions/workflows/test.yml/badge.svg)
+
 # Welcome!
 
 Repo-watcher is a small JavaScript library with a big ambition - to foster better public code reuse.
