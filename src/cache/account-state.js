@@ -16,7 +16,7 @@ export class AccountState {
   }
 
   addRepo(repoName) {
-    const path = `github/${this.account}/${repoName}`;
+    const path = `${this.service}/${this.account}/${repoName}`;
     this.repositories[repoName] = {
       timestamp: Math.floor(Date.now() / 1000),
       path,

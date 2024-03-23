@@ -9,6 +9,7 @@ import {
 } from "../data/test-data-utils";
 import customJestExtensions from "../data/jest-extensions";
 import { createTestConfig } from "../utils/config";
+import { jest } from "@jest/globals";
 
 expect.extend(customJestExtensions);
 
@@ -88,7 +89,23 @@ describe("Fetching data from GitHub", () => {
     await fetchRepositories(config, [githubOrg("orga")]);
 
     const repositories = await getRepositories(config);
-    console.log(repositories);
     expect(repositories).toCloselyMatch(expectations, repositoryComparator);
+  });
+
+  test.skip("Fetching can selectively update cache", async () => {
+    jest.useFakeTimers();
+    const config = await createTestConfig();
+    await fetchRepositories(config, [githubUser("user1")]);
+    await fetchRepositories(config, [githubOrg("orga")]);
+
+    const repoBquery = { service: "github", account: "user1", repo: "repo-a" };
+    //const { versions = b1versions } = await getRepository(config, repoBquery);
+
+    //expect(b1versions.last).toEqual(b1versions.first);
+
+    jest.advanceTimersByTime(10_000);
+    await fetchRepositories(config, [
+      githubUser("user1", { include: ["repo-a"] }),
+    ]);
   });
 });
