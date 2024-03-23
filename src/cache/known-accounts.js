@@ -2,6 +2,7 @@ export class KnownAccounts {
   static #PATH = "accounts";
 
   constructor() {
+    this.timestamp = 0;
     this.services = {};
   }
 
@@ -17,6 +18,7 @@ export class KnownAccounts {
   }
 
   async saveTo(cache) {
+    this.timestamp = Math.floor(Date.now() / 1000);
     cache.set(KnownAccounts.#PATH, this);
   }
 

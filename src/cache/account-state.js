@@ -16,7 +16,7 @@ export class AccountState {
   }
 
   addRepo(repoName) {
-    const path = `${this.service}/${this.account}/${repoName}`;
+    const path = AccountState.#repoPath(this.service, this.account, repoName);
     this.repositories[repoName] = {
       timestamp: Math.floor(Date.now() / 1000),
       path,
@@ -47,7 +47,13 @@ export class AccountState {
     }
   }
 
-  static async getFrom(cache, path) {
+  static async getFrom(cache, { service, name }) {
+    const state = new AccountState(service, name);
+    await state.loadFrom(cache);
+    return state;
+  }
+
+  static async getFromPath(cache, path) {
     const state = new AccountState();
     const data = await cache.get(path);
     Object.assign(state, data);
@@ -56,5 +62,9 @@ export class AccountState {
 
   static #accountPath(service, account) {
     return `${service}/${account}.state`;
+  }
+
+  static #repoPath(service, account, repo) {
+    return `${service}/${account}/${repo}`;
   }
 }

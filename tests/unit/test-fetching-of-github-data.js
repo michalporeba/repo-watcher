@@ -10,6 +10,7 @@ import {
 import customJestExtensions from "../data/jest-extensions";
 import { createTestConfig } from "../utils/config";
 import { jest } from "@jest/globals";
+import { AccountState } from "../../src/cache/account-state";
 
 expect.extend(customJestExtensions);
 
@@ -92,13 +93,26 @@ describe("Fetching data from GitHub", () => {
     expect(repositories).toCloselyMatch(expectations, repositoryComparator);
   });
 
+  test("Fetching updates account state", async () => {
+    const config = await createTestConfig();
+    const { cache } = config;
+    await fetchRepositories(config, [githubUser("user1")]);
+    const state = await AccountState.getFrom(cache, githubUser("user1"));
+    expect(state).toMatchObject({
+      service: "github",
+      account: "user1",
+      timestamp: expect.any(Number),
+    });
+  });
+
   test.skip("Fetching can selectively update cache", async () => {
     jest.useFakeTimers();
     const config = await createTestConfig();
+    const { cache } = config;
     await fetchRepositories(config, [githubUser("user1")]);
     await fetchRepositories(config, [githubOrg("orga")]);
 
-    const repoBquery = { service: "github", account: "user1", repo: "repo-a" };
+    const b1version = await AccountState.getFrom(cache, githubUser("user1"));
     //const { versions = b1versions } = await getRepository(config, repoBquery);
 
     //expect(b1versions.last).toEqual(b1versions.first);

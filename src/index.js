@@ -14,20 +14,21 @@ export const fetchRepositories = async (config, accounts) => {
     try {
       const repositories = fetchAccountRepositories(config, account);
       const filteredRepositories = filterRepositories(repositories, account);
-      const accountState = new AccountState(account.service, account.name);
+      const accountState = await AccountState.getFrom(cache, account);
 
       for await (const repo of filteredRepositories) {
         const repoPath = accountState.addRepo(repo.name);
         await cache.set(repoPath, repo);
         runState.repositories += 1;
       }
+
       await accountState.saveTo(cache);
       knownAccounts.register(accountState);
       runState.accounts += 1;
     } catch (err) {
-      console.warn(err);
       return {
         last: runState,
+        error: err,
       };
     }
 
@@ -53,7 +54,7 @@ export const streamRepositories = async function* (config, query = {}) {
   const knownAccounts = await KnownAccounts.getFrom(cache);
 
   for await (const accountPath of knownAccounts.streamLocations(query)) {
-    const accountState = await AccountState.getFrom(cache, accountPath);
+    const accountState = await AccountState.getFromPath(cache, accountPath);
     for await (const repository of accountState.streamRepositoriesFrom(cache)) {
       yield repository;
     }
@@ -96,11 +97,6 @@ const filterRepositories = async function* (repositories, { include }) {
   }
 };
 
-const processLocally = async function* (accountConfig, accountState, cache) {
-  const repositories = accountState.streamRepositoriesFrom(cache);
-  yield* filterRepositories(repositories, accountConfig);
-};
-
 const processFromGitHub = async function* (
   accountConfig,
   accountState,
@@ -120,10 +116,4 @@ const processFromGitHub = async function* (
 
     yield repo;
   }
-};
-
-const getAccountState = async (service, account, cache) => {
-  const state = new AccountState(service, account);
-  await state.loadFrom(cache);
-  return state;
 };
