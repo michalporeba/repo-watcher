@@ -1,4 +1,4 @@
-![test status](https://github.com/michalporeba/repo-watcher/actions/workflows/test.yml/badge.svg)
+[![test status](https://github.com/michalporeba/repo-watcher/actions/workflows/test.yml/badge.svg)](https://github.com/michalporeba/repo-watcher/actions)
 
 # Welcome!
 
