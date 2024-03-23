@@ -17,8 +17,8 @@ export const fetchRepositories = async (config, accounts) => {
       const accountState = await AccountState.getFrom(cache, account);
 
       for await (const repo of filteredRepositories) {
-        const repoPath = accountState.addRepo(repo.name);
-        await cache.set(repoPath, repo);
+        const path = accountState.addRepository(repo.name);
+        await cache.set(path, repo);
         runState.repositories += 1;
       }
 

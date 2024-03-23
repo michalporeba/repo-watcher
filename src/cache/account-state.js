@@ -15,14 +15,23 @@ export class AccountState {
     return this.timestamp + noRefreshSeconds >= Date.now() / 1000;
   }
 
-  addRepo(repoName) {
-    const path = AccountState.#repoPath(this.service, this.account, repoName);
-    this.repositories[repoName] = {
+  addRepository(name) {
+    const path = AccountState.#repoPath(this.service, this.account, name);
+    this.repositories[name] = {
       timestamp: Math.floor(Date.now() / 1000),
       path,
+      versions: {
+        first: Math.floor(Date.now() / 1000),
+        current: Math.floor(Date.now() / 1000),
+        latest: Math.floor(Date.now() / 1000),
+      },
     };
 
     return path;
+  }
+
+  getRepository(name) {
+    return this.repositories[name];
   }
 
   countRepositories() {

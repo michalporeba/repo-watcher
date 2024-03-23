@@ -105,6 +105,24 @@ describe("Fetching data from GitHub", () => {
     });
   });
 
+  test("Each repository has its own version information", async () => {
+    const config = await createTestConfig();
+    const { cache } = config;
+    await fetchRepositories(config, [githubUser("user1")]);
+    const accountState = await AccountState.getFrom(cache, githubUser("user1"));
+
+    const repoState = accountState.getRepository("repo-a");
+
+    expect(repoState).toMatchObject({
+      timestamp: expect.any(Number),
+      versions: {
+        first: expect.any(Number),
+        current: expect.any(Number),
+        latest: expect.any(Number),
+      },
+    });
+  });
+
   test.skip("Fetching can selectively update cache", async () => {
     jest.useFakeTimers();
     const config = await createTestConfig();
