@@ -7,13 +7,11 @@
   "scripts": {
     "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/unit/",
     "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/integration/",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/",
-    "testing": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage=false --watch ./tests/unit/",
-    "wip": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage=false --watch ./tests/unit/test-fetching-of-github-data.js",
-    "format:check": "prettier --check .",
-    "format:write": "prettier --write .",
-    "lint:check": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "test:all": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/",
+    "wip": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage=false --watch ./tests/unit/",
+    "focus": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage=false --watch ./tests/unit/test-fetching-of-github-data.js",
+    "format": "prettier --check .",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "michalporeba@gmail.com",
