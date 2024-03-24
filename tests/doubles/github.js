@@ -29,7 +29,9 @@ class ConfigurableFakeGitHub {
     if (this.#remainingCalls <= 0) {
       return apiRateExceeded("getLanguages", [owner, repo]);
     }
+
     this.#remainingCalls -= 1;
+    return getExpectedLanguages(owner, repo);
   };
 
   getRemainingLimit = async function () {
@@ -62,7 +64,7 @@ const streamRepositories = async function* ({ name }) {
   }
 };
 
-const getLanguages = async function (owner, repo) {
+const getExpectedLanguages = async function (owner, repo) {
   return await objectFromFile(`${owner}-${repo}.languages.json`);
 };
 

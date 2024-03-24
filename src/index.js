@@ -9,7 +9,6 @@ export const fetchRepositories = async (config, accounts) => {
   const { cache } = await resolveDefaultsFor(config);
   const runState = new RunState();
   const knownAccounts = await KnownAccounts.getFrom(cache);
-
   for (const account of accounts) {
     try {
       const repositories = fetchAccountRepositories(config, account);
@@ -17,6 +16,10 @@ export const fetchRepositories = async (config, accounts) => {
       const accountState = await AccountState.getFrom(cache, account);
 
       for await (const repo of filteredRepositories) {
+        repo.languages = await config.github.getLanguages(
+          repo.account,
+          repo.name,
+        );
         const path = accountState.addRepository(repo.name);
         await cache.set(path, repo);
         runState.repositories += 1;

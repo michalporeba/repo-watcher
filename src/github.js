@@ -22,6 +22,7 @@ export class GitHub {
   };
 
   getLanguages = async function (owner, repo) {
+    console.log(owner, repo);
     const { data } = await this.octokit.rest.repos.listLanguages(
       createRequestForLanguageList(owner, repo),
     );

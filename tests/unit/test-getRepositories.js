@@ -5,6 +5,7 @@ import { fetchRepositories, getRepositories } from "../../src";
 import {
   createMinimalExpectationFor,
   getAllTestAccounts,
+  getExpectedDataFor,
   repositoryComparator,
 } from "../data/test-data-utils";
 
@@ -42,5 +43,15 @@ describe("Test getRepositories", () => {
       orgAexpectations,
       repositoryComparator,
     );
+  });
+
+  test.only("All expected elements are present", async () => {
+    for (const repository of await getRepositories(config)) {
+      const expectation = await getExpectedDataFor(
+        repository.account,
+        repository.name,
+      );
+      expect(repository).toMatchObject(expectation);
+    }
   });
 });
