@@ -11,7 +11,7 @@ export class KnownAccounts {
     this.services[service][account] = path;
   }
 
-  async *streamLocations(query = {}) {
+  async *streamLocations(query) {
     for (const service of this.#streamServices(query)) {
       yield* this.#streamAccountPaths(service, query);
     }
@@ -31,21 +31,21 @@ export class KnownAccounts {
 
   *#streamServices(query) {
     if (query?.service) {
-      return this.services[query.service];
-    }
-
-    for (const service in this.services) {
-      yield this.services[service];
+      yield this.services[query.service];
+    } else {
+      for (const service in this.services) {
+        yield this.services[service];
+      }
     }
   }
 
   *#streamAccountPaths(service, query) {
     if (query?.account) {
-      return service[query.account];
-    }
-
-    for (const account in service) {
-      yield service[account];
+      yield service[query.account];
+    } else {
+      for (const account in service) {
+        yield service[account];
+      }
     }
   }
 }

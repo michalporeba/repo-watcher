@@ -11,10 +11,6 @@ export class AccountState {
     this.repositories = {};
   }
 
-  isInNoRefreshPeriod(noRefreshSeconds) {
-    return this.timestamp + noRefreshSeconds >= Date.now() / 1000;
-  }
-
   addRepository(name) {
     const path = AccountState.#repoPath(this.service, this.account, name);
     this.repositories[name] = {
@@ -32,10 +28,6 @@ export class AccountState {
 
   getRepository(name) {
     return this.repositories[name];
-  }
-
-  countRepositories() {
-    return Object.keys(this.repositories).length;
   }
 
   streamRepositoriesFrom = async function* (cache) {

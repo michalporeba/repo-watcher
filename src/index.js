@@ -39,17 +39,17 @@ export const fetchRepositories = async (config, accounts) => {
   };
 };
 
-export const getRepositories = async (config) => {
+export const getRepositories = async (config, query = {}) => {
   const repositories = [];
 
-  for await (const repository of streamRepositories(config)) {
+  for await (const repository of streamRepositories(config, query)) {
     repositories.push(repository);
   }
 
   return repositories;
 };
 
-export const streamRepositories = async function* (config, query = {}) {
+export const streamRepositories = async function* (config, query) {
   const { cache } = await resolveDefaultsFor(config);
   const knownAccounts = await KnownAccounts.getFrom(cache);
 
@@ -94,26 +94,5 @@ const filterRepositories = async function* (repositories, { include }) {
     if (!include || include.includes(repository.name)) {
       yield repository;
     }
-  }
-};
-
-const processFromGitHub = async function* (
-  accountConfig,
-  accountState,
-  cache,
-  github,
-) {
-  const repositories = github.streamRepositories(accountConfig);
-  const filteredRepositories = filterRepositories(repositories, accountConfig);
-
-  for await (const repo of filteredRepositories) {
-    if (!repo.times?.collected || repo.times.collected < repo.times.updated) {
-      repo.languages = await github.getLanguages(repo.account, repo.name);
-      repo.times.collected = new Date().toISOString();
-      const repoPath = accountState.addRepo(repo.name);
-      await cache.set(repoPath, repo);
-    }
-
-    yield repo;
   }
 };
