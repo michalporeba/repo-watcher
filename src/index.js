@@ -7,36 +7,59 @@ import { KnownAccounts } from "./cache/known-accounts";
 
 export const fetchRepositories = async (config, accounts) => {
   const { cache } = await resolveDefaultsFor(config);
-  const runState = new RunState();
-  const knownAccounts = await KnownAccounts.getFrom(cache);
-  for (const account of accounts) {
-    try {
-      const repositories = fetchAccountRepositories(config, account);
-      const filteredRepositories = filterRepositories(repositories, account);
-      const accountState = await AccountState.getFrom(cache, account);
+  const runState = await RunState.getFrom(cache);
+  if (!runState.tasks.length) {
+    for (const account of accounts) {
+      runState.addTask("reviewRepositories", account);
+    }
+  }
 
-      for await (const repo of filteredRepositories) {
-        repo.languages = await config.github.getLanguages(
-          repo.account,
-          repo.name,
-        );
-        const path = accountState.addRepository(repo.name);
-        await cache.set(path, repo);
-        runState.repositories += 1;
+  const knownAccounts = await KnownAccounts.getFrom(cache);
+
+  try {
+    while (runState.tasks.length) {
+      const { action, params } = runState.tasks.shift();
+      const accountState = await AccountState.getFrom(cache, params);
+
+      if (action == "reviewRepositories") {
+        const repositories = fetchAccountRepositories(config, params);
+        const filteredRepositories = filterRepositories(repositories, params);
+        for await (const repository of filteredRepositories) {
+          const path = accountState.addRepository(repository.name);
+          await cache.set(path, repository);
+          runState.addTask("getLanguages", {
+            ...params,
+            repo: repository.name,
+            path,
+          });
+          runState.repositories += 1;
+        }
+        await accountState.saveTo(cache);
+        knownAccounts.register(accountState);
+        runState.accounts += 1;
+        continue;
       }
 
-      await accountState.saveTo(cache);
-      knownAccounts.register(accountState);
-      runState.accounts += 1;
-    } catch (err) {
-      return {
-        last: runState,
-        error: err,
-      };
+      const repository = await cache.get(params.path);
+      if (action == "getLanguages") {
+        repository.languages = await config.github.getLanguages(
+          repository.account,
+          repository.name,
+        );
+        await cache.set(params.path, repository);
+      }
     }
-
+  } catch (err) {
+    runState.saveTo(cache);
     await knownAccounts.saveTo(cache);
+    return {
+      last: runState,
+      error: err,
+    };
   }
+
+  await knownAccounts.saveTo(cache);
+
   return {
     last: runState,
   };
@@ -62,6 +85,10 @@ export const streamRepositories = async function* (config, query) {
       yield repository;
     }
   }
+};
+
+const reviewAccountRepositories = async function* () {
+  //
 };
 
 const fetchAccountRepositories = async function* (config, account) {
