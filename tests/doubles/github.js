@@ -3,7 +3,7 @@
 import fs from "fs/promises";
 
 class ConfigurableFakeGitHub {
-  #remainingCalls = 1_000;
+  #remainingLimit = 1_000;
   #throwOnCall = false;
   #throwOnAllCalls = false;
 
@@ -11,10 +11,10 @@ class ConfigurableFakeGitHub {
     if (this.#throwOnAllCalls) {
       return unexpectedCall("streamRepositories", [type, name]);
     }
-    if (this.#remainingCalls <= 0) {
+    if (this.#remainingLimit <= 0) {
       return apiRateExceeded("streamRepositories", [type, name]);
     }
-    this.#remainingCalls -= 1;
+    this.#remainingLimit -= 1;
 
     const configuration = await objectFromFile("repositories.json");
     for (const repository of configuration[name]) {
@@ -26,22 +26,22 @@ class ConfigurableFakeGitHub {
     if (this.#throwOnCall || this.#throwOnAllCalls) {
       return unexpectedCall("getLanguages", [owner, repo]);
     }
-    if (this.#remainingCalls <= 0) {
+    if (this.#remainingLimit <= 0) {
       return apiRateExceeded("getLanguages", [owner, repo]);
     }
 
-    this.#remainingCalls -= 1;
+    this.#remainingLimit -= 1;
     return getExpectedLanguages(owner, repo);
   };
 
   getRemainingLimit = async function () {
     // this always works, regardless of the actual limit
     // and doesn't reduce the availabile limit
-    return Promise.resolve(this.#remainingCalls);
+    return Promise.resolve(this.#remainingLimit);
   };
 
   setRemainingLimit = function (newLimit) {
-    this.#remainingCalls = newLimit;
+    this.#remainingLimit = newLimit;
   };
 
   throwOnCall = async function (value = true) {
@@ -55,13 +55,6 @@ class ConfigurableFakeGitHub {
 
 export const createConfigurableFakeGitHub = async function () {
   return new ConfigurableFakeGitHub();
-};
-
-const streamRepositories = async function* ({ name }) {
-  const configuration = await objectFromFile("repositories.json");
-  for (const repository of configuration[name]) {
-    yield await objectFromFile(`${name}-${repository}.first.json`);
-  }
 };
 
 const getExpectedLanguages = async function (owner, repo) {

@@ -45,7 +45,7 @@ describe("Test getRepositories", () => {
     );
   });
 
-  test.only("All expected elements are present", async () => {
+  test("All expected elements are present", async () => {
     for (const repository of await getRepositories(config)) {
       const expectation = await getExpectedDataFor(
         repository.account,
