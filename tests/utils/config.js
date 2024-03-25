@@ -4,12 +4,13 @@ import { resolveDefaultsFor } from "../../src/config";
 import { createConfigurableFakeGitHub } from "../doubles/github";
 
 export const createTestConfig = async function ({
+  cache,
   githubThrow,
   githubThrowAll,
 } = {}) {
   const config = await resolveDefaultsFor({
     noRefreshSeconds: 0, // force API use for now, it will be removed
-    cache: { type: "mem" },
+    cache: cache || { type: "mem" },
     github: createConfigurableFakeGitHub,
   });
   if (githubThrow) {

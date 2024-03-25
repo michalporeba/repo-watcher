@@ -8,12 +8,12 @@ import { KnownAccounts } from "./cache/known-accounts";
 export const fetchRepositories = async (config, accounts) => {
   const { cache } = await resolveDefaultsFor(config);
   const runState = await RunState.retrievOrCreate(cache, accounts);
-
+  await runState.saveTo(cache);
   const knownAccounts = await KnownAccounts.getFrom(cache);
 
   try {
     while (runState.tasks.length) {
-      const { action, params } = runState.tasks.shift();
+      const { action, params } = runState.tasks[0];
       const accountState = await AccountState.getFrom(cache, params);
 
       if (action == "reviewRepositories") {
@@ -32,6 +32,8 @@ export const fetchRepositories = async (config, accounts) => {
         await accountState.saveTo(cache);
         knownAccounts.register(accountState);
         runState.accounts += 1;
+        runState.tasks.shift();
+        await runState.saveTo(cache);
         continue;
       }
 
@@ -43,6 +45,7 @@ export const fetchRepositories = async (config, accounts) => {
         );
         await cache.set(params.path, repository);
       }
+      runState.tasks.shift();
     }
   } catch (err) {
     runState.saveTo(cache);

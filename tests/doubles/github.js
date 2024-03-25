@@ -9,10 +9,10 @@ class ConfigurableFakeGitHub {
 
   streamRepositories = async function* ({ type, name }) {
     if (this.#throwOnAllCalls) {
-      return unexpectedCall("streamRepositories", [type, name]);
+      throw unexpectedCall("streamRepositories", [type, name]);
     }
     if (this.#remainingLimit <= 0) {
-      return apiRateExceeded("streamRepositories", [type, name]);
+      throw apiRateExceeded("streamRepositories", [type, name]);
     }
     this.#remainingLimit -= 1;
 
@@ -24,14 +24,14 @@ class ConfigurableFakeGitHub {
 
   getLanguages = async function (owner, repo) {
     if (this.#throwOnCall || this.#throwOnAllCalls) {
-      return unexpectedCall("getLanguages", [owner, repo]);
+      throw unexpectedCall("getLanguages", [owner, repo]);
     }
     if (this.#remainingLimit <= 0) {
-      return apiRateExceeded("getLanguages", [owner, repo]);
+      throw apiRateExceeded("getLanguages", [owner, repo]);
     }
 
     this.#remainingLimit -= 1;
-    return getExpectedLanguages(owner, repo);
+    return await getExpectedLanguages(owner, repo);
   };
 
   getRemainingLimit = async function () {
@@ -64,7 +64,7 @@ const getExpectedLanguages = async function (owner, repo) {
 const unexpectedCall = (functionName, parameters = []) => {
   const values = parameters.join(", ");
   const message = `The call to ${functionName}(${values}) should not have been made!`;
-  throw new Error(message);
+  return new Error(message);
 };
 
 const apiRateExceeded = (functionName, parameters = []) => {
