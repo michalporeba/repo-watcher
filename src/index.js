@@ -7,12 +7,7 @@ import { KnownAccounts } from "./cache/known-accounts";
 
 export const fetchRepositories = async (config, accounts) => {
   const { cache } = await resolveDefaultsFor(config);
-  const runState = await RunState.getFrom(cache);
-  if (!runState.tasks.length) {
-    for (const account of accounts) {
-      runState.addTask("reviewRepositories", account);
-    }
-  }
+  const runState = await RunState.retrievOrCreate(cache, accounts);
 
   const knownAccounts = await KnownAccounts.getFrom(cache);
 
