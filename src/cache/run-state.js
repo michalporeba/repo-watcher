@@ -15,7 +15,7 @@ export class RunState {
   }
 
   addTask(action, params) {
-    this.tasks.push({ action, params });
+    this.tasks.unshift({ action, params });
   }
 
   *streamTasks() {
@@ -40,6 +40,7 @@ export class RunState {
       for (const account of accounts) {
         state.addTask("reviewRepositories", account);
       }
+      await state.saveTo(cache);
     }
 
     return state;
