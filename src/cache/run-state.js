@@ -18,6 +18,10 @@ export class RunState {
     this.tasks.unshift({ action, params });
   }
 
+  hasTasks() {
+    return this.tasks.length > 0;
+  }
+
   *streamTasks() {
     yield* this.tasks;
   }

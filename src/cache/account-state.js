@@ -12,7 +12,7 @@ export class AccountState {
   }
 
   addRepository(name) {
-    const path = AccountState.#repoPath(this.service, this.account, name);
+    const path = this.getRepositoryDataPath(name);
     this.repositories[name] = {
       timestamp: Math.floor(Date.now() / 1000),
       path,
@@ -22,8 +22,10 @@ export class AccountState {
         latest: Math.floor(Date.now() / 1000),
       },
     };
+  }
 
-    return path;
+  getRepositoryDataPath(name) {
+    return AccountState.#repoPath(this.service, this.account, name);
   }
 
   getRepository(name) {

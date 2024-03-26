@@ -7,16 +7,15 @@ import { KnownAccounts } from "./cache/known-accounts";
 
 export const fetchRepositories = async (config, accounts) => {
   const { cache } = await resolveDefaultsFor(config);
-  const runState = await RunState.retrievOrCreate(cache, accounts);
+  const run = await RunState.retrievOrCreate(cache, accounts);
   let error = null;
 
-  while (!error && runState.tasks.length) {
-    const { action, params } = runState.tasks.shift();
+  while (!error && run.hasTasks()) {
+    const { action, params } = run.tasks.shift();
     try {
-      const accountState = await AccountState.getFrom(cache, params);
-
       if (action == "reviewRepositories") {
-        await reviewAccountRepositories(config, runState, accountState, params);
+        await reviewAccountRepositories(config, run, params);
+        run.accounts += 1;
         continue;
       }
 
@@ -29,16 +28,16 @@ export const fetchRepositories = async (config, accounts) => {
         await cache.set(params.path, repository);
       }
     } catch (err) {
-      runState.addTask(action, params);
+      run.addTask(action, params);
       error = err;
       break;
     }
   }
 
-  await runState.saveTo(cache);
+  await run.saveTo(cache);
 
   return {
-    last: runState,
+    last: run,
     error,
   };
 };
@@ -65,18 +64,16 @@ export const streamRepositories = async function* (config, query) {
   }
 };
 
-const reviewAccountRepositories = async function (
-  config,
-  run,
-  account,
-  params,
-) {
+const reviewAccountRepositories = async function (config, run, params) {
   const { cache } = config;
   const knownAccounts = await KnownAccounts.getFrom(cache);
+  const account = await AccountState.getFrom(cache, params);
   const repositories = fetchAccountRepositories(config, params);
   const filteredRepositories = filterRepositories(repositories, params);
+
   for await (const repository of filteredRepositories) {
-    const path = account.addRepository(repository.name);
+    account.addRepository(repository.name);
+    const path = account.getRepositoryDataPath(repository.name);
     await cache.set(path, repository);
     run.addTask("getLanguages", {
       ...params,
@@ -85,10 +82,10 @@ const reviewAccountRepositories = async function (
     });
     run.repositories += 1;
   }
+
   await account.saveTo(cache);
   knownAccounts.register(account);
-  run.accounts += 1;
-  knownAccounts.saveTo(cache);
+  await knownAccounts.saveTo(cache);
 };
 
 const fetchAccountRepositories = async function* (config, account) {
