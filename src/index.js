@@ -5,6 +5,13 @@ import { AccountState } from "./cache/account-state";
 import { RunState } from "./cache/run-state";
 import { KnownAccounts } from "./cache/known-accounts";
 
+const getActionMethod = (action) => {
+  return {
+    reviewRepositories: reviewAccountRepositories,
+    addLanguages: addRepositoryLanguages,
+  }[action];
+};
+
 export const fetchRepositories = async (config, accounts) => {
   const { cache } = await resolveDefaultsFor(config);
   const run = await RunState.retrievOrCreate(cache, accounts);
@@ -13,20 +20,7 @@ export const fetchRepositories = async (config, accounts) => {
   while (!error && run.hasTasks()) {
     const { action, params } = run.tasks.shift();
     try {
-      if (action == "reviewRepositories") {
-        await reviewAccountRepositories(config, run, params);
-        run.accounts += 1;
-        continue;
-      }
-
-      if (action == "getLanguages") {
-        const repository = await cache.get(params.path);
-        repository.languages = await config.github.getLanguages(
-          repository.account,
-          repository.name,
-        );
-        await cache.set(params.path, repository);
-      }
+      await getActionMethod(action)(config, run, params);
     } catch (err) {
       run.addTask(action, params);
       error = err;
@@ -75,17 +69,27 @@ const reviewAccountRepositories = async function (config, run, params) {
     account.addRepository(repository.name);
     const path = account.getRepositoryDataPath(repository.name);
     await cache.set(path, repository);
-    run.addTask("getLanguages", {
+    run.addTask("addLanguages", {
       ...params,
       repo: repository.name,
       path,
     });
     run.repositories += 1;
   }
+  run.accounts += 1;
 
   await account.saveTo(cache);
   knownAccounts.register(account);
   await knownAccounts.saveTo(cache);
+};
+
+const addRepositoryLanguages = async (config, run, params) => {
+  const repository = await config.cache.get(params.path);
+  repository.languages = await config.github.getLanguages(
+    repository.account,
+    repository.name,
+  );
+  await config.cache.set(params.path, repository);
 };
 
 const fetchAccountRepositories = async function* (config, account) {
