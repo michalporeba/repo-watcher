@@ -20,6 +20,18 @@ export const createOctokit = () => {
   });
 };
 
+export const githubUser = (name, extensions = {}) => {
+  let data = { service: "github", type: "user", name };
+  Object.assign(data, extensions);
+  return data;
+};
+
+export const githubOrg = (name, extensions = {}) => {
+  let data = { service: "github", type: "org", name };
+  Object.assign(data, extensions);
+  return data;
+};
+
 const rateLimitsPlugin = (octokit, _options) => {
   // hook into the request lifecycle
   octokit.hook.wrap("request", async (request, options) => {

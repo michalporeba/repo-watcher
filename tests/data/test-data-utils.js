@@ -1,7 +1,7 @@
 "use strict";
 
 import fs from "fs/promises";
-import { githubOrg, githubUser } from "../../src";
+import { githubOrg, githubUser } from "../../src/github-utils";
 
 const objectFromFile = async (path) => {
   return JSON.parse(await fs.readFile(`./tests/data/${path}`, "utf8"));

@@ -5,34 +5,17 @@ import { AccountState } from "./cache/account-state";
 import { RunState } from "./cache/run-state";
 import { KnownAccounts } from "./cache/known-accounts";
 
-const getActionMethod = (action) => {
-  return {
-    reviewRepositories: reviewAccountRepositories,
-    addLanguages: addRepositoryLanguages,
-  }[action];
-};
+export const fetchRepositories = async (rawConfig, accounts) => {
+  const config = await resolveDefaultsFor(rawConfig);
+  const run = await RunState.retrievOrCreate(config.cache, accounts);
+  const lastError = await processRunTasks(config, run);
 
-export const fetchRepositories = async (config, accounts) => {
-  const { cache } = await resolveDefaultsFor(config);
-  const run = await RunState.retrievOrCreate(cache, accounts);
-  let error = null;
-
-  while (!error && run.hasTasks()) {
-    const { action, params } = run.tasks.shift();
-    try {
-      await getActionMethod(action)(config, run, params);
-    } catch (err) {
-      run.addTask(action, params);
-      error = err;
-      break;
-    }
-  }
-
-  await run.saveTo(cache);
+  await config.cache.flush();
+  await run.saveTo(config.cache);
 
   return {
     last: run,
-    error,
+    error: lastError,
   };
 };
 
@@ -52,8 +35,25 @@ export const streamRepositories = async function* (config, query) {
 
   for await (const accountPath of knownAccounts.streamLocations(query)) {
     const accountState = await AccountState.getFromPath(cache, accountPath);
-    for await (const repository of accountState.streamRepositoriesFrom(cache)) {
-      yield repository;
+    yield* accountState.streamRepositoriesFrom(cache);
+  }
+};
+
+const getActionMethod = (action) => {
+  return {
+    reviewRepositories: reviewAccountRepositories,
+    addLanguages: addRepositoryLanguages,
+  }[action];
+};
+
+const processRunTasks = async (config, run) => {
+  while (run.hasTasks()) {
+    const { action, params } = run.tasks.shift();
+    try {
+      await getActionMethod(action)(config, run, params);
+    } catch (err) {
+      run.addTask(action, params);
+      return err.message;
     }
   }
 };
@@ -84,12 +84,12 @@ const reviewAccountRepositories = async function (config, run, params) {
 };
 
 const addRepositoryLanguages = async (config, run, params) => {
-  const repository = await config.cache.get(params.path);
+  const repository = await config.cache.peek(params.path);
   repository.languages = await config.github.getLanguages(
     repository.account,
     repository.name,
   );
-  await config.cache.set(params.path, repository);
+  await config.cache.stage(params.path, repository);
 };
 
 const fetchAccountRepositories = async function* (config, account) {
@@ -105,18 +105,6 @@ const getRepositoryFetcher = (service) => {
 
 const fetchGitHubRepositories = async function* (config, account) {
   yield* config.github.streamRepositories(account);
-};
-
-export const githubUser = (name, extensions = {}) => {
-  let data = { service: "github", type: "user", name };
-  Object.assign(data, extensions);
-  return data;
-};
-
-export const githubOrg = (name, extensions = {}) => {
-  let data = { service: "github", type: "org", name };
-  Object.assign(data, extensions);
-  return data;
 };
 
 const filterRepositories = async function* (repositories, { include }) {

@@ -1,6 +1,9 @@
 "use strict";
 
 export class CacheBase {
+  constructor() {
+    this.staged = null;
+  }
   // istanbul ignore next
   async set(_key, _value) {
     return Promise.reject(
@@ -27,5 +30,28 @@ export class CacheBase {
     return Promise.reject(
       new Error("remove is not implemented! Use a specialised class instance."),
     );
+  }
+
+  async peek(key) {
+    if (this.staged?.key != key) {
+      await this.stage(key, await this.get(key));
+    }
+    return this.staged.value;
+  }
+
+  async stage(key, value) {
+    if (this?.staged != key) {
+      await this.flush();
+    }
+    this.staged = {
+      key,
+      value,
+    };
+  }
+
+  async flush() {
+    if (this.staged) {
+      await this.set(this.staged.key, this.staged.value);
+    }
   }
 }

@@ -1,7 +1,7 @@
 "use strict";
 
 import { fetchRepositories, getRepositories } from "../../src";
-import { githubUser, githubOrg } from "../../src";
+import { githubUser, githubOrg } from "../../src/github-utils";
 import {
   createMinimalExpectationFor,
   getAllTestAccounts,
