@@ -28,6 +28,16 @@ export class GitHub {
     return data;
   };
 
+  getWorkflows = async function (owner, repo) {
+    console.log("WORKFLOWS");
+
+    const url = `https://api.github.com/repos/${owner}/${repo}/actions/workflows`;
+    const data = await fetch(url).then((res) => res.json());
+
+    console.log(data);
+    return formatWorkflows(data);
+  };
+
   getRemainingLimit = async function () {
     const info = await this.octokit.getRateInfo();
     return info.remaining;
@@ -75,6 +85,14 @@ const getUserRepositories = async (user, octokit) =>
     octokit.rest.repos.listForUser,
     createRequestForUserRepos(user),
   );
+
+const formatWorkflows = (data) => {
+  var formatted = {
+    total: data.total_count,
+    active: data.workflows.filter((w) => w.state == "active").length,
+  };
+  return formatted;
+};
 
 const createRepositoryDataFormatterFor = (account) => (repo) => ({
   account,

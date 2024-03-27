@@ -97,6 +97,14 @@ describe("GitHub - Octokit wrapper", () => {
     expect(languages).toMatchObject({ JavaScript: expect.any(Number) });
   });
 
+  test.only("can get repo workflows", async () => {
+    const workflows = await github.getWorkflows("michalporeba", "repo-watcher");
+    expect(workflows).toMatchObject({
+      total: expect.any(Number),
+      active: expect.any(Number),
+    });
+  });
+
   test("getting rate limit works - they decrease with calls", async () => {
     const first = await github.getRemainingLimit();
     await github.getLanguages("michalporeba", "repo-watcher");

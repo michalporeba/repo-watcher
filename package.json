@@ -9,7 +9,7 @@
     "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/integration/",
     "test:all": "node --experimental-vm-modules node_modules/jest/bin/jest.js ./tests/",
     "wip": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage=false --watch ./tests/unit/",
-    "focus": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage=false --watch ./tests/unit/test-fetching-in-batches.js",
+    "focus": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage=false --watch ./tests/integration/test-github-client.js",
     "format": "prettier --check .",
     "lint": "eslint ."
   },
