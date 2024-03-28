@@ -33,14 +33,14 @@ export class CacheBase {
   }
 
   async peek(key) {
-    if (this.staged?.key != key) {
+    if (!this.staged?.key || this.staged?.key != key) {
       await this.stage(key, await this.get(key));
     }
-    return this.staged.value;
+    return this.staged?.value;
   }
 
   async stage(key, value) {
-    if (this?.staged != key) {
+    if (this.staged?.key && this?.staged.key != key) {
       await this.flush();
     }
     this.staged = {
@@ -52,6 +52,7 @@ export class CacheBase {
   async flush() {
     if (this.staged) {
       await this.set(this.staged.key, this.staged.value);
+      this.staged = null;
     }
   }
 }

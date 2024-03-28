@@ -34,6 +34,18 @@ class ConfigurableFakeGitHub {
     return await getExpectedLanguages(owner, repo);
   };
 
+  getWorkflows = async function (owner, repo) {
+    if (this.#throwOnCall || this.#throwOnAllCalls) {
+      throw unexpectedCall("getWorkflows", [owner, repo]);
+    }
+    if (this.#remainingLimit <= 0) {
+      throw apiRateExceeded("getWorkflows", [owner, repo]);
+    }
+
+    this.#remainingLimit -= 1;
+    return await getExpectedWorkflows(owner, repo);
+  };
+
   getRemainingLimit = async function () {
     // this always works, regardless of the actual limit
     // and doesn't reduce the availabile limit
@@ -61,6 +73,10 @@ const getExpectedLanguages = async function (owner, repo) {
   return await objectFromFile(`${owner}-${repo}.languages.json`);
 };
 
+const getExpectedWorkflows = async function (owner, repo) {
+  return await objectFromFile(`${owner}-${repo}.workflows.json`);
+};
+
 const unexpectedCall = (functionName, parameters = []) => {
   const values = parameters.join(", ");
   const message = `The call to ${functionName}(${values}) should not have been made!`;
@@ -74,5 +90,9 @@ const apiRateExceeded = (functionName, parameters = []) => {
 };
 
 const objectFromFile = async (path) => {
-  return JSON.parse(await fs.readFile(`./tests/data/${path}`, "utf8"));
+  try {
+    return JSON.parse(await fs.readFile(`./tests/data/${path}`, "utf8"));
+  } catch {
+    return {};
+  }
 };

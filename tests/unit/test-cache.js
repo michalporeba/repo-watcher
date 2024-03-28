@@ -25,4 +25,18 @@ describe("Ensure behaviour of the default cache utils", () => {
 
     expect(sut()).rejects.toThrow();
   });
+
+  test("Peeking non-existing data returns undefined", async () => {
+    const cache = await createCache({ type: "mem" });
+    const result = await cache.peek("test");
+    expect(result).toBeUndefined();
+  });
+
+  test("Peeking without staging first pulls data from the cache", async () => {
+    const cache = await createCache({ type: "fs" });
+    const expected = { value: 42 };
+    await cache.set("test", expected);
+    const result = await cache.peek("test");
+    expect(result).toMatchObject(expected);
+  });
 });

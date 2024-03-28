@@ -43,6 +43,7 @@ const getActionMethod = (action) => {
   return {
     reviewRepositories: reviewAccountRepositories,
     addLanguages: addRepositoryLanguages,
+    addWorkflows: addRepositoryWorkflows,
   }[action];
 };
 
@@ -50,6 +51,7 @@ const processRunTasks = async (config, run) => {
   while (run.hasTasks()) {
     const { action, params } = run.tasks.shift();
     try {
+      console.log(action);
       await getActionMethod(action)(config, run, params);
     } catch (err) {
       run.addTask(action, params);
@@ -69,11 +71,13 @@ const reviewAccountRepositories = async function (config, run, params) {
     account.addRepository(repository.name);
     const path = account.getRepositoryDataPath(repository.name);
     await cache.set(path, repository);
-    run.addTask("addLanguages", {
+    const repoParams = {
       ...params,
       repo: repository.name,
       path,
-    });
+    };
+    run.addTask("addWorkflows", repoParams);
+    run.addTask("addLanguages", repoParams);
     run.repositories += 1;
   }
   run.accounts += 1;
@@ -83,9 +87,18 @@ const reviewAccountRepositories = async function (config, run, params) {
   await knownAccounts.saveTo(cache);
 };
 
-const addRepositoryLanguages = async (config, run, params) => {
+const addRepositoryLanguages = async (config, _run, params) => {
   const repository = await config.cache.peek(params.path);
   repository.languages = await config.github.getLanguages(
+    repository.account,
+    repository.name,
+  );
+  await config.cache.stage(params.path, repository);
+};
+
+const addRepositoryWorkflows = async (config, _run, params) => {
+  const repository = await config.cache.peek(params.path);
+  repository.workflows = await config.github.getWorkflows(
     repository.account,
     repository.name,
   );

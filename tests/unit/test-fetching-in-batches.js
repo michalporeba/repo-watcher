@@ -14,7 +14,7 @@ expect.extend(customJestExtensions);
 
 describe("Fetching can be split into multiple batches", () => {
   test("Even api limit of 1 is not a problem", async () => {
-    const config = await createTestConfig({ cache: { type: "fs" } });
+    const config = await createTestConfig();
     for (let i = 0; i < 10; i++) {
       config.github.setRemainingLimit(1);
       await fetchRepositories(config, getAllTestAccounts());

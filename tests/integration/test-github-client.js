@@ -97,7 +97,7 @@ describe("GitHub - Octokit wrapper", () => {
     expect(languages).toMatchObject({ JavaScript: expect.any(Number) });
   });
 
-  test.only("can get repo workflows", async () => {
+  test("can get repo workflows", async () => {
     const workflows = await github.getWorkflows("michalporeba", "repo-watcher");
     expect(workflows).toMatchObject({
       total: expect.any(Number),
