@@ -39,4 +39,21 @@ describe("Ensure behaviour of the default cache utils", () => {
     const result = await cache.peek("test");
     expect(result).toMatchObject(expected);
   });
+
+  test("Peaking gets the latest staged version while the get gets older", async () => {
+    const cache = await createCache({ type: "fs" });
+    await cache.set("test", 42);
+    await cache.stage("test", 43);
+    expect(await cache.peek("test")).toEqual(43);
+    expect(await cache.get("test")).toEqual(42);
+  });
+
+  test("Flushing updates the cache with staged value", async () => {
+    const cache = await createCache({ type: "fs" });
+    expect(await cache.get("test")).toEqual(42);
+    await cache.stage("test", 43);
+    await cache.set("test", 42);
+    await cache.flush();
+    await cache.set("test", 43);
+  });
 });
