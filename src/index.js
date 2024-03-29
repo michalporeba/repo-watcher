@@ -1,13 +1,13 @@
 "use strict";
 
 import { resolveDefaultsFor } from "./config";
-import { AccountState } from "./cache/account-state";
-import { RunState } from "./cache/run-state";
+import { Account } from "./model/account";
+import { Run } from "./model/run";
 import { KnownAccounts } from "./cache/known-accounts";
 
 export const fetchRepositories = async (rawConfig, accounts) => {
   const config = await resolveDefaultsFor(rawConfig);
-  const run = await RunState.retrievOrCreate(config.cache, accounts);
+  const run = await Run.retrievOrCreate(config.cache, accounts);
   await processRunTasks(config, run);
   await config.cache.flush();
   await run.saveTo(config.cache);
@@ -30,8 +30,8 @@ export const streamRepositories = async function* (config, query) {
   const knownAccounts = await KnownAccounts.getFrom(cache);
 
   for await (const accountPath of knownAccounts.streamLocations(query)) {
-    const accountState = await AccountState.getFromPath(cache, accountPath);
-    yield* accountState.streamRepositoriesFrom(cache);
+    const account = await Account.getFromPath(cache, accountPath);
+    yield* account.streamRepositoriesFrom(cache);
   }
 };
 
@@ -59,7 +59,7 @@ const processRunTasks = async (config, run) => {
 const reviewAccountRepositories = async function (config, run, params) {
   const { cache } = config;
   const knownAccounts = await KnownAccounts.getFrom(cache);
-  const account = await AccountState.getFrom(cache, params);
+  const account = await Account.getFrom(cache, params);
   const repositories = fetchAccountRepositories(config, params);
   const filteredRepositories = filterRepositories(repositories, params);
 

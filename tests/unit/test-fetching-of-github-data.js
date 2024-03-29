@@ -9,7 +9,7 @@ import {
 } from "../data/test-data-utils";
 import customJestExtensions from "../data/jest-extensions";
 import { createTestConfig } from "../utils/config";
-import { AccountState } from "../../src/cache/account-state";
+import { Account } from "../../src/model/account";
 
 expect.extend(customJestExtensions);
 
@@ -93,7 +93,7 @@ describe("Fetching data from GitHub", () => {
     const config = await createTestConfig();
     const { cache } = config;
     await fetchRepositories(config, [githubUser("user1")]);
-    const state = await AccountState.getFrom(cache, githubUser("user1"));
+    const state = await Account.getFrom(cache, githubUser("user1"));
     expect(state).toMatchObject({
       service: "github",
       account: "user1",
@@ -103,12 +103,9 @@ describe("Fetching data from GitHub", () => {
 
   test("Each repository has its own version information", async () => {
     await fetchRepositories(config, [githubUser("user1")]);
-    const accountState = await AccountState.getFrom(
-      config.cache,
-      githubUser("user1"),
-    );
+    const account = await Account.getFrom(config.cache, githubUser("user1"));
 
-    const repoState = accountState.getRepository("repo-a");
+    const repoState = account.getRepository("repo-a");
 
     expect(repoState).toMatchObject({
       timestamp: expect.any(Number),

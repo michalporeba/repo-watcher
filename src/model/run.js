@@ -2,7 +2,7 @@
 
 import crypto from "crypto";
 
-export class RunState {
+export class Run {
   static #PATH = "current.run.state";
 
   constructor() {
@@ -37,12 +37,12 @@ export class RunState {
 
   async saveTo(cache) {
     this.timestamp = Math.floor(Date.now() / 1000);
-    await cache.set(RunState.#PATH, this);
+    await cache.set(Run.#PATH, this);
   }
 
   static async retrievOrCreate(cache, accounts) {
-    const hash = RunState.#hash(accounts);
-    const state = await RunState.getFrom(cache);
+    const hash = Run.#hash(accounts);
+    const state = await Run.getFrom(cache);
 
     if (state.hash != hash && state.tasks.length == 0) {
       state.accounts.total = 0;
@@ -58,8 +58,8 @@ export class RunState {
   }
 
   static async getFrom(cache) {
-    let state = new RunState();
-    const data = await cache.get(RunState.#PATH);
+    let state = new Run();
+    const data = await cache.get(Run.#PATH);
     Object.assign(state, data);
     return state;
   }

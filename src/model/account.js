@@ -1,12 +1,12 @@
 "use strict";
 
-export class AccountState {
+export class Account {
   static #LIST_KEY = "accounts.json";
 
   constructor(service, account) {
     this.service = service;
     this.account = account;
-    this.path = AccountState.#accountPath(service, account);
+    this.path = Account.#accountPath(service, account);
     this.timestamp = 0;
     this.repositories = {};
   }
@@ -25,7 +25,7 @@ export class AccountState {
   }
 
   getRepositoryDataPath(name) {
-    return AccountState.#repoPath(this.service, this.account, name);
+    return Account.#repoPath(this.service, this.account, name);
   }
 
   getRepository(name) {
@@ -51,13 +51,13 @@ export class AccountState {
   }
 
   static async getFrom(cache, { service, name }) {
-    const state = new AccountState(service, name);
+    const state = new Account(service, name);
     await state.loadFrom(cache);
     return state;
   }
 
   static async getFromPath(cache, path) {
-    const state = new AccountState();
+    const state = new Account();
     const data = await cache.get(path);
     Object.assign(state, data);
     return state;
