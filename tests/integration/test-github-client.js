@@ -8,6 +8,7 @@
 
 import { createGitHub } from "../../src/github-utils";
 import customJestExtensions from "../data/jest-extensions";
+import { jest } from "@jest/globals";
 
 const NON_EMPTY_STRING_REGEX = /.+/;
 const URL_REGEX =
@@ -15,6 +16,7 @@ const URL_REGEX =
 const DATETIME_REGEX =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
 
+jest.setTimeout(10_000);
 expect.extend(customJestExtensions);
 
 const EXPECTED_REPOSITORY_SHAPE = {
