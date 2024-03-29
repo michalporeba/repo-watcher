@@ -105,7 +105,7 @@ describe("GitHub - Octokit wrapper", () => {
     });
   }, 10_000);
 
-  test.only("can get repo community metrics", async () => {
+  test("can get repo community metrics", async () => {
     const metrics = await github.getCommunityMetrics(
       "michalporeba",
       "repo-watcher",
