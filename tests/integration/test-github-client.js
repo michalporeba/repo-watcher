@@ -95,7 +95,7 @@ describe("GitHub - Octokit wrapper", () => {
   test("can get repo languages", async () => {
     const languages = await github.getLanguages("michalporeba", "repo-watcher");
     expect(languages).toMatchObject({ JavaScript: expect.any(Number) });
-  });
+  }, 10_000);
 
   test("can get repo workflows", async () => {
     const workflows = await github.getWorkflows("michalporeba", "repo-watcher");
@@ -103,12 +103,12 @@ describe("GitHub - Octokit wrapper", () => {
       total: expect.any(Number),
       active: expect.any(Number),
     });
-  });
+  }, 10_000);
 
   test("getting rate limit works - they decrease with calls", async () => {
     const first = await github.getRemainingLimit();
     await github.getLanguages("michalporeba", "repo-watcher");
     const second = await github.getRemainingLimit();
     expect(second).toBeLessThan(first);
-  });
+  }, 10_000);
 });

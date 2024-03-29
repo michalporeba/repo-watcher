@@ -31,8 +31,6 @@ export class GitHub {
   getWorkflows = async function (owner, repo) {
     const url = `https://api.github.com/repos/${owner}/${repo}/actions/workflows`;
     const data = await fetch(url).then((res) => res.json());
-
-    console.log(data);
     return formatWorkflows(data);
   };
 

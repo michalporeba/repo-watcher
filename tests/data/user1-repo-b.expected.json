@@ -36,5 +36,9 @@
     "hasWiki": true
   },
   "topLanguage": "Gleam",
-  "languages": {}
+  "languages": {},
+  "workflows": {
+    "total": 1,
+    "active": 0
+  }
 }
