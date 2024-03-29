@@ -8,15 +8,11 @@ import { KnownAccounts } from "./cache/known-accounts";
 export const fetchRepositories = async (rawConfig, accounts) => {
   const config = await resolveDefaultsFor(rawConfig);
   const run = await RunState.retrievOrCreate(config.cache, accounts);
-  const lastError = await processRunTasks(config, run);
-
+  await processRunTasks(config, run);
   await config.cache.flush();
   await run.saveTo(config.cache);
 
-  return {
-    last: run,
-    error: lastError,
-  };
+  return run;
 };
 
 export const getRepositories = async (config, query = {}) => {
@@ -51,11 +47,11 @@ const processRunTasks = async (config, run) => {
   while (run.hasTasks()) {
     const { action, params } = run.tasks.shift();
     try {
-      console.log(action);
       await getActionMethod(action)(config, run, params);
     } catch (err) {
       run.addTask(action, params);
-      return err.message;
+      run.error = err.message;
+      break;
     }
   }
 };
@@ -80,7 +76,8 @@ const reviewAccountRepositories = async function (config, run, params) {
     run.addTask("addLanguages", repoParams);
     run.repositories += 1;
   }
-  run.accounts += 1;
+  run.accounts.processed += 1;
+  run.accounts.remaining -= 1;
 
   await account.saveTo(cache);
   knownAccounts.register(account);

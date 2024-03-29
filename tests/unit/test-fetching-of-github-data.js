@@ -35,11 +35,9 @@ describe("Fetching data from GitHub", () => {
     const account = [githubUser("michalporeba")];
     const status = await fetchRepositories(config, account);
     expect(status).toMatchObject({
-      last: {
-        accounts: 0,
-        repositories: 0,
-        apicalls: { github: 0 },
-      },
+      accounts: { total: 1, processed: 0, remaining: 1 },
+      repositories: 0,
+      apicalls: { github: 0 },
     });
   });
 
@@ -47,10 +45,8 @@ describe("Fetching data from GitHub", () => {
     const query = [githubUser("user1")];
     const status = await fetchRepositories(config, query);
     expect(status).toMatchObject({
-      last: {
-        accounts: 1,
-        repositories: 2,
-      },
+      accounts: { total: 1, processed: 1, remaining: 0 },
+      repositories: 2,
     });
   });
 

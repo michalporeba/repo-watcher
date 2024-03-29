@@ -6,7 +6,11 @@ export class RunState {
   static #PATH = "current.run.state";
 
   constructor() {
-    this.accounts = 0;
+    this.accounts = {
+      total: 0,
+      processed: 0,
+      remaining: 0,
+    };
     this.repositories = 0;
     this.apicalls = {
       github: 0,
@@ -41,7 +45,10 @@ export class RunState {
     const state = await RunState.getFrom(cache);
 
     if (state.hash != hash && state.tasks.length == 0) {
+      state.accounts.total = 0;
       for (const account of accounts) {
+        state.accounts.total += 1;
+        state.accounts.remaining += 1;
         state.addTask("reviewRepositories", account);
       }
       await state.saveTo(cache);
