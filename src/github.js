@@ -30,8 +30,14 @@ export class GitHub {
 
   getWorkflows = async function (owner, repo) {
     const url = `https://api.github.com/repos/${owner}/${repo}/actions/workflows`;
-    const data = await fetch(url).then((res) => res.json());
+    const data = await fetch(url).then((response) => response.json());
     return formatWorkflows(data);
+  };
+
+  getCommunityMetrics = async function (owner, repo) {
+    const url = `https://api.github.com/repos/${owner}/${repo}/community/profile`;
+    const data = await fetch(url).then((response) => response.json());
+    return formatCommunityMetrics(data);
   };
 
   getRemainingLimit = async function () {
@@ -88,6 +94,22 @@ const formatWorkflows = (data) => {
     active: data.workflows.filter((w) => w.state == "active").length,
   };
   return formatted;
+};
+
+const formatCommunityMetrics = (data) => {
+  return {
+    health: data.health_percentage,
+    has: {
+      codeOfConduct: !!data.files.code_of_conduct,
+      contributing: !!data.files.contributing,
+      description: !!data.description,
+      documentation: !!data.documentation,
+      issuesTemplate: !!data.files.issues_template,
+      license: !!data.files.license,
+      prTemplate: !!data.files.pull_request_template,
+      readme: !!data.files.readme,
+    },
+  };
 };
 
 const createRepositoryDataFormatterFor = (account) => (repo) => ({

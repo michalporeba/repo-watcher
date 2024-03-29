@@ -105,6 +105,26 @@ describe("GitHub - Octokit wrapper", () => {
     });
   }, 10_000);
 
+  test.only("can get repo community metrics", async () => {
+    const metrics = await github.getCommunityMetrics(
+      "michalporeba",
+      "repo-watcher",
+    );
+    expect(metrics).toMatchObject({
+      health: expect.any(Number),
+      has: {
+        codeOfConduct: expect.any(Boolean),
+        contributing: expect.any(Boolean),
+        description: expect.any(Boolean),
+        documentation: expect.any(Boolean),
+        issuesTemplate: expect.any(Boolean),
+        license: expect.any(Boolean),
+        prTemplate: expect.any(Boolean),
+        readme: expect.any(Boolean),
+      },
+    });
+  });
+
   test("getting rate limit works - they decrease with calls", async () => {
     const first = await github.getRemainingLimit();
     await github.getLanguages("michalporeba", "repo-watcher");
