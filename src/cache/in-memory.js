@@ -16,4 +16,8 @@ export class InMemoryCache extends CacheBase {
   async get(key) {
     return Promise.resolve(this.cache[key]);
   }
+
+  async remove(key) {
+    this.cache[key] = undefined;
+  }
 }

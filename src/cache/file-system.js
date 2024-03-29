@@ -12,8 +12,8 @@ export class FileSystemCache extends CacheBase {
     this.#cacheRootPath = config?.path ?? "cache";
   }
 
-  #toFolderAndFile(base, path) {
-    const fullPath = pathtools.join(base, path);
+  #toFolderAndFile(path) {
+    const fullPath = pathtools.join(this.#cacheRootPath, `${path}.json`);
     return {
       fullPath: fullPath,
       folder: pathtools.dirname(fullPath),
@@ -26,10 +26,7 @@ export class FileSystemCache extends CacheBase {
   }
 
   async set(key, value) {
-    const { fullPath, folder } = this.#toFolderAndFile(
-      this.#cacheRootPath,
-      `${key}.json`,
-    );
+    const { fullPath, folder } = this.#toFolderAndFile(key);
     await this.#ensureFolderExists(folder);
     const data = JSON.stringify(value, null, 2);
     await writeFile(fullPath, data);
@@ -37,11 +34,9 @@ export class FileSystemCache extends CacheBase {
 
   async get(key) {
     try {
-      const { fullPath } = this.#toFolderAndFile(
-        this.#cacheRootPath,
-        `${key}.json`,
-      );
-      return JSON.parse(await readFile(fullPath, "utf8"));
+      const { fullPath } = this.#toFolderAndFile(key);
+      const data = await readFile(fullPath, "utf8");
+      return JSON.parse(data);
     } catch {
       // if file cannot be open, the value probably doesn't exist
       return undefined;
@@ -50,18 +45,10 @@ export class FileSystemCache extends CacheBase {
 
   async remove(key) {
     try {
-      const { fullPath } = this.#toFolderAndFile(
-        this.#cacheRootPath,
-        `${key}.json`,
-      );
+      const { fullPath } = this.#toFolderAndFile(key);
       await unlink(fullPath);
     } catch {
       // most likely the file doesn't exist, so that's OK
     }
-  }
-
-  async update(key, value) {
-    const data = await this.get(key);
-    await this.set(key, { ...data, ...value });
   }
 }

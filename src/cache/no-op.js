@@ -7,6 +7,5 @@ export class NoopCache extends CacheBase {
   async get(_key) {
     return null;
   }
-  async update(_key, _value) {}
   async remove(_key) {}
 }

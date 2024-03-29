@@ -15,13 +15,13 @@ export class CacheBase {
   }
 
   // istanbul ignore next
-  async update(_key, _value) {
-    return rejectCallTo("update");
-  }
-
-  // istanbul ignore next
   async remove(_key) {
     return rejectCallTo("remove");
+  }
+
+  async update(key, value) {
+    const data = await this.get(key);
+    await this.set(key, { ...data, ...value });
   }
 
   async peek(key) {

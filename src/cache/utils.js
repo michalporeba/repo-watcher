@@ -15,7 +15,6 @@ export const createCache = async (config = {}) => {
   const CacheClass = cacheFactories[type];
 
   if (CacheClass) {
-    console.log("constructing");
     return new CacheClass(config);
   }
 
