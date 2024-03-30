@@ -55,7 +55,7 @@ export class Run {
     await cache.set(Run.#PATH, this);
   }
 
-  static async retrievOrCreate(cache, accounts) {
+  async retrievOrCreate(cache, accounts) {
     const hash = Run.#hash(accounts);
     const state = await Run.getFrom(cache);
 
@@ -69,7 +69,7 @@ export class Run {
       await state.saveTo(cache);
     }
 
-    return state;
+    return Object.assign(this, state);
   }
 
   static async getFrom(cache) {
