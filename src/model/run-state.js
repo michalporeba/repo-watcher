@@ -16,6 +16,14 @@ export class RunState {
     this.tasks = [];
   }
 
+  addTask(action, params) {
+    this.tasks.unshift({ action, params });
+  }
+
+  hasTasks() {
+    return this.tasks.length > 0;
+  }
+
   async saveTo(cache) {
     this.timestamp = Math.floor(Date.now() / 1000);
     await cache.set(RunState.#PATH, this);

@@ -13,7 +13,7 @@ export const fetchRepositories = async (rawConfig, accounts) => {
   await config.cache.flush();
   await run.saveTo(config.cache);
 
-  return run;
+  return run.state;
 };
 
 export const getRepositories = async (config, query = {}) => {

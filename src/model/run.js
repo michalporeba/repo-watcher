@@ -3,40 +3,31 @@
 import crypto from "crypto";
 import { KnownAccounts } from "../cache/known-accounts";
 import { Account } from "./account";
+import { RunState } from "./run-state";
 
 export class Run {
   static #PATH = "current.run.state";
+  state = new RunState();
 
-  constructor() {
-    this.accounts = {
-      total: 0,
-      processed: 0,
-      remaining: 0,
-    };
-    this.repositories = 0;
-    this.apicalls = {
-      github: 0,
-    };
-    this.tasks = [];
-  }
+  constructor() {}
 
   addTask(action, params) {
-    this.tasks.unshift({ action, params });
+    this.state.tasks.unshift({ action, params });
   }
 
   hasTasks() {
-    return this.tasks.length > 0;
+    return this.state.tasks.length > 0;
   }
 
   *streamTasks() {
-    yield* this.tasks;
+    yield* this.state.tasks;
   }
 
   async processTasks(config) {
     while (this.hasTasks()) {
-      const { action, params } = this.tasks.shift();
+      const { action, params } = this.state.tasks.shift();
       try {
-        await this.#getActionMethod(action)(config, this, params);
+        await this.#getActionMethod(action)(config, this.state, params);
       } catch (err) {
         this.addTask(action, params);
         this.error = err.message;
@@ -51,13 +42,12 @@ export class Run {
   }
 
   async saveTo(cache) {
-    this.timestamp = Math.floor(Date.now() / 1000);
-    await cache.set(Run.#PATH, this);
+    this.state.saveTo(cache);
   }
 
   async retrievOrCreate(cache, accounts) {
     const hash = Run.#hash(accounts);
-    const state = await Run.getFrom(cache);
+    const state = await RunState.getFrom(cache);
 
     if (state.hash != hash && state.tasks.length == 0) {
       state.accounts.total = 0;
@@ -69,13 +59,12 @@ export class Run {
       await state.saveTo(cache);
     }
 
-    return Object.assign(this, state);
+    return Object.assign(this.state, state);
   }
 
   static async getFrom(cache) {
-    let state = new Run();
-    const data = await cache.get(Run.#PATH);
-    Object.assign(state, data);
+    const state = new Run();
+    state.state = await RunState.getFrom(cache);
     return state;
   }
 
