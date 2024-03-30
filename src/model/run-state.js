@@ -19,11 +19,11 @@ export class RunState {
   addAccount(action, params) {
     this.accounts.total += 1;
     this.accounts.remaining += 1;
-    this.addTask(action, params);
+    this.addTask({ action, params });
   }
 
-  addTask(action, params) {
-    this.tasks.unshift({ action, params });
+  addTask(task) {
+    this.tasks.unshift(task);
   }
 
   hasTasks() {
@@ -35,7 +35,8 @@ export class RunState {
     return this.current;
   }
 
-  undoLastTask() {
+  undoLastTask(reason) {
+    this.error = reason;
     if (this.current) {
       this.addTask(this.current);
       this.current = undefined;

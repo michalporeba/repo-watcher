@@ -4,7 +4,6 @@ import crypto from "crypto";
 import { KnownAccounts } from "../cache/known-accounts";
 import { Account } from "./account";
 import { RunState } from "./run-state";
-import { create } from "domain";
 
 export class Run {
   state = new RunState();
@@ -14,21 +13,16 @@ export class Run {
   }
 
   addTask(action, params) {
-    this.state.addTask(action, params);
-  }
-
-  hasTasks() {
-    return this.state.hasTasks();
+    this.state.addTask({ action, params });
   }
 
   async processTasks() {
-    while (this.hasTasks()) {
-      const { action, params } = this.state.nextTask();
+    while (this.state.hasTasks()) {
       try {
+        const { action, params } = this.state.nextTask();
         await this.#getActionMethod(action)(this.config, this.state, params);
-      } catch (err) {
-        this.addTask(action, params);
-        this.state.error = err.message;
+      } catch (error) {
+        this.state.undoLastTask(error.message);
         break;
       }
     }
@@ -91,8 +85,8 @@ export class Run {
         repo: repository.name,
         path,
       };
-      run.addTask("addWorkflows", repoParams);
-      run.addTask("addLanguages", repoParams);
+      run.addTask({ action: "addWorkflows", params: repoParams });
+      run.addTask({ action: "addLanguages", params: repoParams });
       run.repositories += 1;
     }
     run.accounts.processed += 1;
