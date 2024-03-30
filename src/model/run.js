@@ -36,7 +36,7 @@ export class Run {
     while (this.hasTasks()) {
       const { action, params } = this.tasks.shift();
       try {
-        await getActionMethod(action)(config, this, params);
+        await Run.getActionMethod(action)(config, this, params);
       } catch (err) {
         this.addTask(action, params);
         this.error = err.message;
@@ -78,15 +78,15 @@ export class Run {
     Object.assign(state, data);
     return state;
   }
-}
 
-const getActionMethod = (action) => {
-  return {
-    reviewRepositories: reviewAccountRepositories,
-    addLanguages: addRepositoryLanguages,
-    addWorkflows: addRepositoryWorkflows,
-  }[action];
-};
+  static getActionMethod = (action) => {
+    return {
+      reviewRepositories: reviewAccountRepositories,
+      addLanguages: addRepositoryLanguages,
+      addWorkflows: addRepositoryWorkflows,
+    }[action];
+  };
+}
 
 const reviewAccountRepositories = async function (config, run, params) {
   const { cache } = config;
