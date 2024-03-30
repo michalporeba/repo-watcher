@@ -35,6 +35,15 @@ export class RunState {
     return this.current;
   }
 
+  processedAccount() {
+    this.accounts.processed += 1;
+    this.accounts.remaining -= 1;
+  }
+
+  processedRepository() {
+    this.repositories += 1;
+  }
+
   undoLastTask(reason) {
     this.error = reason;
     if (this.current) {

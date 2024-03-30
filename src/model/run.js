@@ -38,7 +38,7 @@ export class Run {
     await this.state.saveTo(this.config.cache);
   }
 
-  async loadState(accounts) {
+  async loadOrCreateState(accounts) {
     const hash = Run.#hash(accounts);
     let state = await RunState.getFrom(this.config.cache);
 
@@ -55,7 +55,7 @@ export class Run {
     state.hash = Run.#hash(accounts);
 
     for (const account of accounts) {
-      state.addAccount("reviewRepositories", account);
+      state.addAccount("reviewAccount", account);
     }
 
     return state;
@@ -63,13 +63,13 @@ export class Run {
 
   #getActionMethod = (action) => {
     return {
-      reviewRepositories: this.reviewAccountRepositories,
+      reviewAccount: this.reviewAccount,
       addLanguages: this.addRepositoryLanguages,
       addWorkflows: this.addRepositoryWorkflows,
     }[action];
   };
 
-  reviewAccountRepositories = async function (config, run, params) {
+  reviewAccount = async function (config, runstate, params) {
     const { cache } = config;
     const knownAccounts = await KnownAccounts.getFrom(cache);
     const account = await Account.getFrom(cache, params);
@@ -85,12 +85,11 @@ export class Run {
         repo: repository.name,
         path,
       };
-      run.addTask({ action: "addWorkflows", params: repoParams });
-      run.addTask({ action: "addLanguages", params: repoParams });
-      run.repositories += 1;
+      runstate.addTask({ action: "addWorkflows", params: repoParams });
+      runstate.addTask({ action: "addLanguages", params: repoParams });
+      runstate.processedRepository();
     }
-    run.accounts.processed += 1;
-    run.accounts.remaining -= 1;
+    runstate.processedAccount();
 
     await account.saveTo(cache);
     knownAccounts.register(account);
