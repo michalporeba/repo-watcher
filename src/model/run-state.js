@@ -16,6 +16,12 @@ export class RunState {
     this.tasks = [];
   }
 
+  addAccount(action, params) {
+    this.accounts.total += 1;
+    this.accounts.remaining += 1;
+    this.addTask(action, params);
+  }
+
   addTask(action, params) {
     this.tasks.unshift({ action, params });
   }

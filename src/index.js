@@ -5,12 +5,10 @@ import { Account } from "./model/account";
 import { Run } from "./model/run";
 import { KnownAccounts } from "./cache/known-accounts";
 
-export const fetchRepositories = async (rawConfig, accounts) => {
-  const config = await resolveDefaultsFor(rawConfig);
-  const run = new Run(config);
+export const fetchRepositories = async (config, accounts) => {
+  const run = new Run(await resolveDefaultsFor(config));
   await run.loadState(accounts);
-  await run.processTasks(config);
-  await config.cache.flush();
+  await run.processTasks();
   await run.save();
 
   return run.state;

@@ -24,14 +24,14 @@ export class Run {
     yield* this.state.tasks;
   }
 
-  async processTasks(config) {
+  async processTasks() {
     while (this.hasTasks()) {
       const { action, params } = this.state.tasks.shift();
       try {
-        await this.#getActionMethod(action)(config, this.state, params);
+        await this.#getActionMethod(action)(this.config, this.state, params);
       } catch (err) {
         this.addTask(action, params);
-        this.error = err.message;
+        this.state.error = err.message;
         break;
       }
     }
@@ -43,30 +43,23 @@ export class Run {
   }
 
   async save() {
+    await this.config.cache.flush();
     this.state.saveTo(this.config.cache);
   }
 
   async loadState(accounts) {
     const hash = Run.#hash(accounts);
-    const state = await RunState.getFrom(this.config.cache);
+    let state = await RunState.getFrom(this.config.cache);
 
     if (state.hash != hash && state.tasks.length == 0) {
-      state.accounts.total = 0;
+      state = new RunState();
       for (const account of accounts) {
-        state.accounts.total += 1;
-        state.accounts.remaining += 1;
-        state.addTask("reviewRepositories", account);
+        state.addAccount("reviewRepositories", account);
       }
       await state.saveTo(this.config.cache);
     }
 
     return Object.assign(this.state, state);
-  }
-
-  static async getFrom(cache) {
-    const state = new Run();
-    state.state = await RunState.getFrom(cache);
-    return state;
   }
 
   #getActionMethod = (action) => {
