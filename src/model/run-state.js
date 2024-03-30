@@ -31,7 +31,15 @@ export class RunState {
   }
 
   nextTask() {
-    return this.tasks.shift();
+    this.current = this.tasks.shift();
+    return this.current;
+  }
+
+  undoLastTask() {
+    if (this.current) {
+      this.addTask(this.current);
+      this.current = undefined;
+    }
   }
 
   async saveTo(cache) {

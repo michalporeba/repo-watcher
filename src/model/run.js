@@ -4,6 +4,7 @@ import crypto from "crypto";
 import { KnownAccounts } from "../cache/known-accounts";
 import { Account } from "./account";
 import { RunState } from "./run-state";
+import { create } from "domain";
 
 export class Run {
   state = new RunState();
@@ -40,7 +41,7 @@ export class Run {
 
   async save() {
     await this.config.cache.flush();
-    this.state.saveTo(this.config.cache);
+    await this.state.saveTo(this.config.cache);
   }
 
   async loadState(accounts) {
@@ -48,15 +49,23 @@ export class Run {
     let state = await RunState.getFrom(this.config.cache);
 
     if (state.hash != hash && !state.hasTasks()) {
-      state = new RunState();
-      for (const account of accounts) {
-        state.addAccount("reviewRepositories", account);
-      }
+      state = this.#createNewRunFor(accounts);
       await state.saveTo(this.config.cache);
     }
 
-    return Object.assign(this.state, state);
+    this.state = state;
   }
+
+  #createNewRunFor = (accounts) => {
+    const state = new RunState();
+    state.hash = Run.#hash(accounts);
+
+    for (const account of accounts) {
+      state.addAccount("reviewRepositories", account);
+    }
+
+    return state;
+  };
 
   #getActionMethod = (action) => {
     return {
