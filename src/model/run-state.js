@@ -30,6 +30,10 @@ export class RunState {
     return this.tasks.length > 0;
   }
 
+  nextTask() {
+    return this.tasks.shift();
+  }
+
   async saveTo(cache) {
     this.timestamp = Math.floor(Date.now() / 1000);
     await cache.set(RunState.#PATH, this);

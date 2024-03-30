@@ -7,26 +7,22 @@ import { RunState } from "./run-state";
 
 export class Run {
   state = new RunState();
-  config = null;
+
   constructor(config) {
     this.config = config;
   }
 
   addTask(action, params) {
-    this.state.tasks.unshift({ action, params });
+    this.state.addTask(action, params);
   }
 
   hasTasks() {
-    return this.state.tasks.length > 0;
-  }
-
-  *streamTasks() {
-    yield* this.state.tasks;
+    return this.state.hasTasks();
   }
 
   async processTasks() {
     while (this.hasTasks()) {
-      const { action, params } = this.state.tasks.shift();
+      const { action, params } = this.state.nextTask();
       try {
         await this.#getActionMethod(action)(this.config, this.state, params);
       } catch (err) {
@@ -51,7 +47,7 @@ export class Run {
     const hash = Run.#hash(accounts);
     let state = await RunState.getFrom(this.config.cache);
 
-    if (state.hash != hash && state.tasks.length == 0) {
+    if (state.hash != hash && !state.hasTasks()) {
       state = new RunState();
       for (const account of accounts) {
         state.addAccount("reviewRepositories", account);
