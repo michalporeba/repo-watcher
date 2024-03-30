@@ -7,11 +7,11 @@ import { KnownAccounts } from "./cache/known-accounts";
 
 export const fetchRepositories = async (rawConfig, accounts) => {
   const config = await resolveDefaultsFor(rawConfig);
-  const run = new Run();
-  await run.retrievOrCreate(config.cache, accounts);
+  const run = new Run(config);
+  await run.loadState(accounts);
   await run.processTasks(config);
   await config.cache.flush();
-  await run.saveTo(config.cache);
+  await run.save();
 
   return run.state;
 };

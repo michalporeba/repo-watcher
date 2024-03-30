@@ -6,10 +6,11 @@ import { Account } from "./account";
 import { RunState } from "./run-state";
 
 export class Run {
-  static #PATH = "current.run.state";
   state = new RunState();
-
-  constructor() {}
+  config = null;
+  constructor(config) {
+    this.config = config;
+  }
 
   addTask(action, params) {
     this.state.tasks.unshift({ action, params });
@@ -41,13 +42,13 @@ export class Run {
     return crypto.createHash("md5").update(data).digest("hex");
   }
 
-  async saveTo(cache) {
-    this.state.saveTo(cache);
+  async save() {
+    this.state.saveTo(this.config.cache);
   }
 
-  async retrievOrCreate(cache, accounts) {
+  async loadState(accounts) {
     const hash = Run.#hash(accounts);
-    const state = await RunState.getFrom(cache);
+    const state = await RunState.getFrom(this.config.cache);
 
     if (state.hash != hash && state.tasks.length == 0) {
       state.accounts.total = 0;
@@ -56,7 +57,7 @@ export class Run {
         state.accounts.remaining += 1;
         state.addTask("reviewRepositories", account);
       }
-      await state.saveTo(cache);
+      await state.saveTo(this.config.cache);
     }
 
     return Object.assign(this.state, state);
