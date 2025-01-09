@@ -17,7 +17,7 @@
   "author": "michalporeba@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "@octokit/rest": "^21.0.2"
+    "@octokit/rest": "^21.1.0"
   },
   "devDependencies": {
     "eslint": "^9.16.0",
